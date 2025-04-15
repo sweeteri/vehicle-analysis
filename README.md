@@ -1,5 +1,5 @@
 # vehicles-analysis
-
+[![Python package](https://github.com/sweeteri/vehicle-analysis/actions/workflows/python-package.yml/badge.svg)](https://github.com/sweeteri/vehicle-analysis/actions/workflows/python-package.yml)
 ### Технологии
 - Python 3.12
 - Django 5.2
