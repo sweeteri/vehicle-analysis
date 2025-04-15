@@ -1,0 +1,38 @@
+{% extends "includes/base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="card">
+    <div class="card-header">
+      <h2>{{ vehicle.name }}</h2>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-6">
+          <h4>Основные параметры</h4>
+          <ul class="list-group">
+            <li class="list-group-item">Масса: {{ vehicle.mass_kg }} кг</li>
+            <li class="list-group-item">Лобовая площадь: {{ vehicle.frontal_area_m2 }} м²</li>
+            <li class="list-group-item">Cx: {{ vehicle.drag_coefficient }}</li>
+          </ul>
+        </div>
+        
+        <div class="col-md-6">
+          <h4>{% if vehicle.vehicle_type == 'ICE' %}ДВС{% else %}Электродвигатель{% endif %}</h4>
+          <ul class="list-group">
+            {% if vehicle.vehicle_type == 'ICE' %}
+              <li class="list-group-item">Расход топлива: {{ vehicle.fuel_consumption_lp100km }} л/100км</li>
+              <li class="list-group-item">Выбросы CO₂: {{ vehicle.co2_emissions_gl }} г/л</li>
+            {% else %}
+              <li class="list-group-item">Ёмкость батареи: {{ vehicle.battery_capacity_kwh }} кВт·ч</li>
+              <li class="list-group-item">КПД двигателя: {{ vehicle.motor_efficiency|floatformat:2 }}</li>
+            {% endif %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <a href="{% url 'vehicle_list' %}" class="btn btn-secondary mt-3">Назад к списку</a>
+</div>
+{% endblock %}

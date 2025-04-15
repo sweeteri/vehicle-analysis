@@ -1,0 +1,362 @@
+[
+  {
+    "model": "vehicles.icevehicle",
+    "fields": {
+      "name": "Volkswagen Golf 1.5 TSI",
+      "mass_kg": 1280,
+      "frontal_area_m2": 2.2,
+      "drag_coefficient": 0.30,
+      "rolling_coefficient": 0.012,
+      "road_type": "mixed",
+      "engine_efficiency": 0.35,
+      "fuel_consumption_lp100km": 5.8,
+      "co2_emissions_gl": 2300,
+      "transmission_ratio": 4.2
+    }
+  },
+  {
+    "model": "vehicles.evvehicle",
+    "fields": {
+      "name": "Tesla Model 3 Long Range",
+      "mass_kg": 1850,
+      "frontal_area_m2": 2.3,
+      "drag_coefficient": 0.23,
+      "rolling_coefficient": 0.011,
+      "road_type": "city",
+      "battery_capacity_kwh": 75,
+      "energy_consumption_kwhp100km": 14,
+      "motor_efficiency": 0.93,
+      "charging_efficiency": 0.92
+    }
+  },
+  {
+    "model": "vehicles.icevehicle",
+    "fields": {
+      "name": "Toyota Corolla 1.8 Hybrid",
+      "mass_kg": 1390,
+      "frontal_area_m2": 2.25,
+      "drag_coefficient": 0.29,
+      "rolling_coefficient": 0.013,
+      "road_type": "mixed",
+      "engine_efficiency": 0.38,
+      "fuel_consumption_lp100km": 4.7,
+      "co2_emissions_gl": 2100,
+      "transmission_ratio": 3.9
+    }
+  },
+  {
+    "model": "vehicles.evvehicle",
+    "fields": {
+      "name": "Nissan Leaf e+",
+      "mass_kg": 1680,
+      "frontal_area_m2": 2.28,
+      "drag_coefficient": 0.28,
+      "rolling_coefficient": 0.012,
+      "road_type": "city",
+      "battery_capacity_kwh": 62,
+      "energy_consumption_kwhp100km": 16,
+      "motor_efficiency": 0.91,
+      "charging_efficiency": 0.90
+    }
+  },
+  {
+    "model": "vehicles.hevvehicle",
+    "fields": {
+      "name": "Toyota RAV4 Hybrid",
+      "mass_kg": 1670,
+      "frontal_area_m2": 2.65,
+      "drag_coefficient": 0.34,
+      "rolling_coefficient": 0.015,
+      "road_type": "highway",
+      "engine_efficiency": 0.36,
+      "fuel_consumption_lp100km": 5.3,
+      "co2_emissions_gl": 2200,
+      "transmission_ratio": 4.1,
+      "battery_capacity_kwh": 1.6,
+      "energy_consumption_kwhp100km": 5.5,
+      "motor_efficiency": 0.90,
+      "charging_efficiency": 0.85,
+      "ice_share": 0.6,
+      "generator_efficiency": 0.88
+    }
+  },
+  {
+    "model": "vehicles.icevehicle",
+    "fields": {
+      "name": "BMW 320i",
+      "mass_kg": 1470,
+      "frontal_area_m2": 2.35,
+      "drag_coefficient": 0.26,
+      "rolling_coefficient": 0.011,
+      "road_type": "highway",
+      "engine_efficiency": 0.32,
+      "fuel_consumption_lp100km": 6.2,
+      "co2_emissions_gl": 2400,
+      "transmission_ratio": 4.5
+    }
+  },
+  {
+    "model": "vehicles.evvehicle",
+    "fields": {
+      "name": "Hyundai Kona Electric",
+      "mass_kg": 1685,
+      "frontal_area_m2": 2.4,
+      "drag_coefficient": 0.29,
+      "rolling_coefficient": 0.014,
+      "road_type": "mixed",
+      "battery_capacity_kwh": 64,
+      "energy_consumption_kwhp100km": 15,
+      "motor_efficiency": 0.92,
+      "charging_efficiency": 0.91
+    }
+  },
+  {
+    "model": "vehicles.icevehicle",
+    "fields": {
+      "name": "Audi A4 2.0 TDI",
+      "mass_kg": 1540,
+      "frontal_area_m2": 2.3,
+      "drag_coefficient": 0.27,
+      "rolling_coefficient": 0.012,
+      "road_type": "mixed",
+      "engine_efficiency": 0.40,
+      "fuel_consumption_lp100km": 4.9,
+      "co2_emissions_gl": 1900,
+      "transmission_ratio": 4.0
+    }
+  },
+  {
+    "model": "vehicles.hevvehicle",
+    "fields": {
+      "name": "Ford Escape Hybrid",
+      "mass_kg": 1620,
+      "frontal_area_m2": 2.6,
+      "drag_coefficient": 0.33,
+      "rolling_coefficient": 0.014,
+      "road_type": "city",
+      "engine_efficiency": 0.37,
+      "fuel_consumption_lp100km": 5.1,
+      "co2_emissions_gl": 2000,
+      "transmission_ratio": 3.8,
+      "battery_capacity_kwh": 1.4,
+      "energy_consumption_kwhp100km": 6.0,
+      "motor_efficiency": 0.89,
+      "charging_efficiency": 0.86,
+      "ice_share": 0.55,
+      "generator_efficiency": 0.87
+    }
+  },
+  {
+    "model": "vehicles.evvehicle",
+    "fields": {
+      "name": "Kia EV6 GT-Line",
+      "mass_kg": 2010,
+      "frontal_area_m2": 2.55,
+      "drag_coefficient": 0.28,
+      "rolling_coefficient": 0.013,
+      "road_type": "highway",
+      "battery_capacity_kwh": 77,
+      "energy_consumption_kwhp100km": 18,
+      "motor_efficiency": 0.94,
+      "charging_efficiency": 0.93
+    }
+  },
+  {
+    "model": "vehicles.icevehicle",
+    "fields": {
+      "name": "Mercedes-Benz C200",
+      "mass_kg": 1590,
+      "frontal_area_m2": 2.4,
+      "drag_coefficient": 0.25,
+      "rolling_coefficient": 0.011,
+      "road_type": "highway",
+      "engine_efficiency": 0.34,
+      "fuel_consumption_lp100km": 6.0,
+      "co2_emissions_gl": 2300,
+      "transmission_ratio": 4.3
+    }
+  },
+  {
+    "model": "vehicles.evvehicle",
+    "fields": {
+      "name": "Volkswagen ID.4 Pro",
+      "mass_kg": 2120,
+      "frontal_area_m2": 2.62,
+      "drag_coefficient": 0.28,
+      "rolling_coefficient": 0.014,
+      "road_type": "mixed",
+      "battery_capacity_kwh": 82,
+      "energy_consumption_kwhp100km": 17,
+      "motor_efficiency": 0.92,
+      "charging_efficiency": 0.91
+    }
+  },
+  {
+    "model": "vehicles.hevvehicle",
+    "fields": {
+      "name": "Lexus NX 450h+",
+      "mass_kg": 1970,
+      "frontal_area_m2": 2.7,
+      "drag_coefficient": 0.33,
+      "rolling_coefficient": 0.015,
+      "road_type": "mixed",
+      "engine_efficiency": 0.39,
+      "fuel_consumption_lp100km": 5.0,
+      "co2_emissions_gl": 1950,
+      "transmission_ratio": 3.9,
+      "battery_capacity_kwh": 18,
+      "energy_consumption_kwhp100km": 8.5,
+      "motor_efficiency": 0.93,
+      "charging_efficiency": 0.90,
+      "ice_share": 0.45,
+      "generator_efficiency": 0.89
+    }
+  },
+  {
+    "model": "vehicles.icevehicle",
+    "fields": {
+      "name": "Skoda Octavia 1.5 TSI",
+      "mass_kg": 1320,
+      "frontal_area_m2": 2.25,
+      "drag_coefficient": 0.29,
+      "rolling_coefficient": 0.012,
+      "road_type": "mixed",
+      "engine_efficiency": 0.36,
+      "fuel_consumption_lp100km": 5.5,
+      "co2_emissions_gl": 2250,
+      "transmission_ratio": 4.0
+    }
+  },
+  {
+    "model": "vehicles.evvehicle",
+    "fields": {
+      "name": "Polestar 2 Long Range",
+      "mass_kg": 2090,
+      "frontal_area_m2": 2.5,
+      "drag_coefficient": 0.24,
+      "rolling_coefficient": 0.012,
+      "road_type": "highway",
+      "battery_capacity_kwh": 78,
+      "energy_consumption_kwhp100km": 16,
+      "motor_efficiency": 0.95,
+      "charging_efficiency": 0.94
+    }
+  },
+  {
+    "model": "vehicles.icevehicle",
+    "fields": {
+      "name": "Honda Civic 1.5 Turbo",
+      "mass_kg": 1340,
+      "frontal_area_m2": 2.2,
+      "drag_coefficient": 0.30,
+      "rolling_coefficient": 0.012,
+      "road_type": "city",
+      "engine_efficiency": 0.37,
+      "fuel_consumption_lp100km": 5.6,
+      "co2_emissions_gl": 2200,
+      "transmission_ratio": 4.1
+    }
+  },
+  {
+    "model": "vehicles.hevvehicle",
+    "fields": {
+      "name": "Toyota Prius Prime",
+      "mass_kg": 1490,
+      "frontal_area_m2": 2.3,
+      "drag_coefficient": 0.25,
+      "rolling_coefficient": 0.011,
+      "road_type": "city",
+      "engine_efficiency": 0.40,
+      "fuel_consumption_lp100km": 4.2,
+      "co2_emissions_gl": 1800,
+      "transmission_ratio": 3.7,
+      "battery_capacity_kwh": 13,
+      "energy_consumption_kwhp100km": 7.0,
+      "motor_efficiency": 0.94,
+      "charging_efficiency": 0.92,
+      "ice_share": 0.35,
+      "generator_efficiency": 0.90
+    }
+  },
+  {
+    "model": "vehicles.evvehicle",
+    "fields": {
+      "name": "Ford Mustang Mach-E",
+      "mass_kg": 2230,
+      "frontal_area_m2": 2.68,
+      "drag_coefficient": 0.30,
+      "rolling_coefficient": 0.014,
+      "road_type": "highway",
+      "battery_capacity_kwh": 88,
+      "energy_consumption_kwhp100km": 19,
+      "motor_efficiency": 0.93,
+      "charging_efficiency": 0.92
+    }
+  },
+  {
+    "model": "vehicles.icevehicle",
+    "fields": {
+      "name": "Mazda CX-5 2.5 Turbo",
+      "mass_kg": 1720,
+      "frontal_area_m2": 2.75,
+      "drag_coefficient": 0.35,
+      "rolling_coefficient": 0.016,
+      "road_type": "mixed",
+      "engine_efficiency": 0.33,
+      "fuel_consumption_lp100km": 7.2,
+      "co2_emissions_gl": 2500,
+      "transmission_ratio": 4.6
+    }
+  },
+  {
+    "model": "vehicles.evvehicle",
+    "fields": {
+      "name": "BMW i4 eDrive40",
+      "mass_kg": 2050,
+      "frontal_area_m2": 2.45,
+      "drag_coefficient": 0.24,
+      "rolling_coefficient": 0.012,
+      "road_type": "highway",
+      "battery_capacity_kwh": 83,
+      "energy_consumption_kwhp100km": 16,
+      "motor_efficiency": 0.95,
+      "charging_efficiency": 0.94
+    }
+  },
+  {
+    "model": "vehicles.hevvehicle",
+    "fields": {
+      "name": "Hyundai Tucson Hybrid",
+      "mass_kg": 1640,
+      "frontal_area_m2": 2.72,
+      "drag_coefficient": 0.34,
+      "rolling_coefficient": 0.015,
+      "road_type": "mixed",
+      "engine_efficiency": 0.38,
+      "fuel_consumption_lp100km": 5.4,
+      "co2_emissions_gl": 2050,
+      "transmission_ratio": 4.0,
+      "battery_capacity_kwh": 1.5,
+      "energy_consumption_kwhp100km": 6.2,
+      "motor_efficiency": 0.91,
+      "charging_efficiency": 0.88,
+      "ice_share": 0.5,
+      "generator_efficiency": 0.87
+    }
+  },
+  {
+    "model": "vehicles.icevehicle",
+    "fields": {
+      "name": "Subaru Outback 2.5",
+      "mass_kg": 1680,
+      "frontal_area_m2": 2.8,
+      "drag_coefficient": 0.36,
+      "rolling_coefficient": 0.017,
+      "road_type": "highway",
+      "engine_efficiency": 0.31,
+      "fuel_consumption_lp100km": 7.5,
+      "co2_emissions_gl": 2600,
+      "transmission_ratio": 4.8
+    }
+  }
+]

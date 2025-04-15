@@ -1,0 +1,68 @@
+{% extends "includes/base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+  <h1 class="mb-4">Каталог автомобилей</h1>
+  
+  <!-- Фильтры -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <form method="get">
+        <div class="row">
+          <div class="col-md-3">
+            <label>Тип:</label>
+            <select name="type" class="form-select">
+              <option value="">Все</option>
+              <option value="ICE">ДВС</option>
+              <option value="EV">Электромобили</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <button type="submit" class="btn btn-primary mt-4">Фильтровать</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Таблица с авто -->
+  <div class="table-responsive">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Модель</th>
+          <th>Тип</th>
+          <th>Масса (кг)</th>
+          <th>Расход</th>
+          <th>Действия</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for vehicle in vehicles %}
+        <tr>
+          <td>{{ vehicle.name }}</td>
+          <td>
+            {% if vehicle.vehicle_type == 'ICE' %}
+              <span class="badge bg-danger">ДВС</span>
+            {% elif vehicle.vehicle_type == 'EV' %}
+              <span class="badge bg-success">EV</span>
+            {% endif %}
+          </td>
+          <td>{{ vehicle.mass_kg }}</td>
+          <td>
+            {% if vehicle.vehicle_type == 'ICE' %}
+              {{ vehicle.fuel_consumption_lp100km }} л/100км
+            {% else %}
+              {{ vehicle.energy_consumption_kwhp100km }} кВт·ч/100км
+            {% endif %}
+          </td>
+          <td>
+            <a href="{% url 'vehicle_detail' vehicle.id %}" class="btn btn-sm btn-info">Подробнее</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
