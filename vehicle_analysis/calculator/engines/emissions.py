@@ -91,5 +91,5 @@ class EmissionsCalculator:
         return [{
             'vehicle': v,
             'emissions': cls.calculate_co2(v, distance, **kwargs)
-        } for v in vehicles]
-
+        } for v in vehicles
+        ]
