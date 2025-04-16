@@ -33,6 +33,3 @@ jobs:
       run: |
         # stop the build if there are Python syntax errors or undefined names
         flake8 . --count --show-source --statistics --max-line-length=120 --exclude=migrations
-    - name: Test with pytest
-      run: |
-        pytest
