@@ -8,6 +8,7 @@ class BaseVehicle(models.Model):
     frontal_area_m2 = models.FloatField(verbose_name="Лобовая площадь (м²)")
     drag_coefficient = models.FloatField(verbose_name="Коэффициент аэродинамического сопротивления (Cx)")
     rolling_coefficient = models.FloatField(verbose_name="Коэффициент сопротивления качению (Cr)")
+    production_price = models.FloatField(verbose_name='Стоимость производства', default=1000)
 
     ROAD_TYPES = (
         ('city', 'Город'),
@@ -72,12 +73,18 @@ class ElectricSpecs(models.Model):
 class ICEVehicle(BaseVehicle, EngineSpecs):
     """Модель для автомобилей с ДВС"""
 
+    class Meta:
+        app_label = 'vehicles'
+
     def __str__(self):
         return f"{self.name} (ДВС)"
 
 
 class EVVehicle(BaseVehicle, ElectricSpecs):
     """Модель для электромобилей"""
+
+    class Meta:
+        app_label = 'vehicles'
 
     def __str__(self):
         return f"{self.name} (Электромобиль)"
@@ -94,6 +101,9 @@ class HEVVehicle(BaseVehicle, EngineSpecs, ElectricSpecs):
         verbose_name="КПД генератора",
         default=0.85
     )
+
+    class Meta:
+        app_label = 'vehicles'
 
     def __str__(self):
         return f"{self.name} (Гибрид)"

@@ -1,6 +1,7 @@
 from django.contrib import admin
 from .models import ICEVehicle, EVVehicle, HEVVehicle
 
+
 @admin.register(ICEVehicle)
 class ICEVehicleAdmin(admin.ModelAdmin):
     list_display = ('name', 'mass_kg', 'fuel_consumption_lp100km')
@@ -13,9 +14,11 @@ class ICEVehicleAdmin(admin.ModelAdmin):
         })
     )
 
+
 @admin.register(EVVehicle)
 class EVVehicleAdmin(admin.ModelAdmin):
     list_display = ('name', 'battery_capacity_kwh', 'energy_consumption_kwhp100km')
+
 
 @admin.register(HEVVehicle)
 class HEVVehicleAdmin(admin.ModelAdmin):

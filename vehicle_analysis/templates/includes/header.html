@@ -10,13 +10,7 @@
         </button>
 
         <div class="collapse navbar-collapse" id="navbarNav">
-{#            <ul class="navbar-nav me-auto">#}
-{#                <li class="nav-item">#}
-{#                    <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}"#}
-{#                       href="{% url 'home' %}">#}
-{#                        <i class="fas fa-home me-1"></i> Главная#}
-{#                    </a>#}
-{#                </li>#}
+            <ul class="navbar-nav me-auto">  
                 <li class="nav-item">
                     <a class="nav-link {% if request.resolver_match.url_name == 'vehicle_list' %}active{% endif %}"
                        href="{% url 'vehicle_list' %}">
@@ -24,14 +18,12 @@
                     </a>
                 </li>
                 <li class="nav-item">
-{#                    <a class="nav-link {% if request.resolver_match.url_name == 'calculator' %}active{% endif %}"#}
-{#                       href="{% url 'calculator' %}">#}
+                    <a class="nav-link {% if request.resolver_match.url_name == 'calculator' %}active{% endif %}"
+                       href="{% url 'calculator' %}">
                         <i class="fas fa-calculator me-1"></i> Калькулятор
-{#                    </a>#}
+                    </a>
                 </li>
             </ul>
-
-
         </div>
     </div>
 </header>
