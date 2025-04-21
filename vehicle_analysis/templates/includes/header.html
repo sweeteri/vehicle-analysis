@@ -1,6 +1,6 @@
 <header class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top shadow-sm">
     <div class="container">
-        <a class="navbar-brand d-flex align-items-center" href="{% url 'vehicle_list' %}">
+        <a class="navbar-brand d-flex align-items-center" href="{% url 'vehicles:vehicle_list' %}">
             <i class="fas fa-car-side me-2"></i>
             <span class="fw-bold">TCO Calculator</span>
         </a>
@@ -12,14 +12,14 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto">  
                 <li class="nav-item">
-                    <a class="nav-link {% if request.resolver_match.url_name == 'vehicle_list' %}active{% endif %}"
-                       href="{% url 'vehicle_list' %}">
+                    <a class="nav-link {% if view_name == 'vehicles:vehicle_list' %}active{% endif %}"
+                       href="{% url 'vehicles:vehicle_list' %}">
                         <i class="fas fa-list me-1"></i> Каталог авто
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {% if request.resolver_match.url_name == 'calculator' %}active{% endif %}"
-                       href="{% url 'calculator' %}">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'calculator:calculator' %}active{% endif %}"
+                       href="{% url 'calculator:calculator' %}">
                         <i class="fas fa-calculator me-1"></i> Калькулятор
                     </a>
                 </li>

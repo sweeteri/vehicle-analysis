@@ -1,35 +1,40 @@
+from django.views.generic import View
 from django.shortcuts import render, get_object_or_404
-from .models import ICEVehicle, EVVehicle
+from .models import ICEVehicle, EVVehicle, HEVVehicle
 
 
-def vehicle_list(request):
-    vehicles = []
+class VehicleListView(View):
+    template_name = 'vehicles/list.html'
+    context_object_name = 'vehicle_list'
 
-    # Добавляем все типы авто в один список
-    vehicles.extend(ICEVehicle.objects.all())
-    vehicles.extend(EVVehicle.objects.all())
+    def get(self, request, *args, **kwargs):
+        vehicle_type = request.GET.get('type')
+        if vehicle_type == 'ICE':
+            vehicles = ICEVehicle.objects.all()
+        elif vehicle_type == 'EV':
+            vehicles = EVVehicle.objects.all()
+        elif vehicle_type == 'HEV':
+            vehicles = HEVVehicle.objects.all()
+        else:
+            vehicles = list(ICEVehicle.objects.all()) + list(EVVehicle.objects.all())
 
-    # Фильтрация по типу
-    vehicle_type = request.GET.get('type')
-    if vehicle_type == 'ICE':
-        vehicles = ICEVehicle.objects.all()
-    elif vehicle_type == 'EV':
-        vehicles = EVVehicle.objects.all()
-
-    return render(request, 'vehicles/list.html', {'vehicles': vehicles})
+        return render(request, self.template_name, {'vehicles': vehicles})
 
 
-def vehicle_detail(request, pk):
-    # Пробуем найти авто в каждой модели
-    vehicle = None
-    for model in [ICEVehicle, EVVehicle]:
-        try:
-            vehicle = model.objects.get(pk=pk)
-            break
-        except model.DoesNotExist:
-            continue
+class VehicleDetailView(View):
+    template_name = 'vehicles/detail.html'
+    context_object_name = 'vehicle_detail'
 
-    if not vehicle:
-        raise get_object_or_404("Автомобиль не найден")
+    def get(self, request, pk, *args, **kwargs):
+        vehicle = None
+        for model in [ICEVehicle, EVVehicle]:
+            try:
+                vehicle = model.objects.get(pk=pk)
+                break
+            except model.DoesNotExist:
+                continue
 
-    return render(request, 'vehicles/detail.html', {'vehicle': vehicle})
+        if not vehicle:
+            raise get_object_or_404(ICEVehicle, pk=pk)
+
+        return render(request, self.template_name, {'vehicle': vehicle})
