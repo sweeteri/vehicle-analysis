@@ -3,7 +3,6 @@
 {% block content %}
 <div class="container mt-4">
   <h1 class="mb-4">Каталог автомобилей</h1>
-  
   <!-- Фильтры -->
   <div class="card mb-4">
     <div class="card-body">
@@ -15,6 +14,7 @@
               <option value="">Все</option>
               <option value="ICE">ДВС</option>
               <option value="EV">Электромобили</option>
+              <option value="HEV">Гибриды</option>
             </select>
           </div>
           <div class="col-md-3">
@@ -31,23 +31,15 @@
       <thead>
         <tr>
           <th>Модель</th>
-          <th>Тип</th>
           <th>Масса (кг)</th>
           <th>Расход</th>
-          <th>Действия</th>
+          <th>Подробнее</th>
         </tr>
       </thead>
       <tbody>
         {% for vehicle in vehicles %}
         <tr>
           <td>{{ vehicle.name }}</td>
-          <td>
-            {% if vehicle.vehicle_type == 'ICE' %}
-              <span class="badge bg-danger">ДВС</span>
-            {% elif vehicle.vehicle_type == 'EV' %}
-              <span class="badge bg-success">EV</span>
-            {% endif %}
-          </td>
           <td>{{ vehicle.mass_kg }}</td>
           <td>
             {% if vehicle.vehicle_type == 'ICE' %}
@@ -57,7 +49,7 @@
             {% endif %}
           </td>
           <td>
-            <a href="{% url 'vehicle_detail' vehicle.id %}" class="btn btn-sm btn-info">Подробнее</a>
+            <a href="{% url 'vehicles:vehicle_detail' vehicle.id %}" class="btn btn-sm btn-info">Подробнее</a>
           </td>
         </tr>
         {% endfor %}
