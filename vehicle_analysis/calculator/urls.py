@@ -5,4 +5,3 @@ app_name = 'calculator'
 urlpatterns = [
     path('', views.CalculateView.as_view(), name='calculator'),
 ]
-

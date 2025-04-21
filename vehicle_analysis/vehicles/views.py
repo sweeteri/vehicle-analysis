@@ -1,4 +1,4 @@
-from django.views.generic import ListView, DetailView, View
+from django.views.generic import View
 from django.shortcuts import render, get_object_or_404
 from .models import ICEVehicle, EVVehicle, HEVVehicle
 
@@ -6,6 +6,7 @@ from .models import ICEVehicle, EVVehicle, HEVVehicle
 class VehicleListView(View):
     template_name = 'vehicles/list.html'
     context_object_name = 'vehicle_list'
+
     def get(self, request, *args, **kwargs):
         vehicle_type = request.GET.get('type')
         if vehicle_type == 'ICE':
@@ -34,8 +35,6 @@ class VehicleDetailView(View):
                 continue
 
         if not vehicle:
-            raise get_object_or_404(ICEVehicle, pk=pk)  # Это вызовет 404. Лучше выбросить вручную, если обе модели не нашли
-            # Или:
-            # raise Http404("Автомобиль не найден")
+            raise get_object_or_404(ICEVehicle, pk=pk)
 
         return render(request, self.template_name, {'vehicle': vehicle})
