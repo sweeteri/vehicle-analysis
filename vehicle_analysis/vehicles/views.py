@@ -1,6 +1,6 @@
 from django.views.generic import View
 from django.shortcuts import render, get_object_or_404
-from .models import ICEVehicle, EVVehicle, HEVVehicle
+from .models import ICEVehicle, EVVehicle, HEVVehicle, PHEVVehicle
 
 
 class VehicleListView(View):
@@ -15,8 +15,10 @@ class VehicleListView(View):
             vehicles = EVVehicle.objects.all()
         elif vehicle_type == 'HEV':
             vehicles = HEVVehicle.objects.all()
+        elif vehicle_type == 'PHEV':
+            vehicles = PHEVVehicle.objects.all()
         else:
-            vehicles = list(ICEVehicle.objects.all()) + list(EVVehicle.objects.all())
+            vehicles = list(ICEVehicle.objects.all()) + list(EVVehicle.objects.all()) + list(HEVVehicle.objects.all()) + list(PHEVVehicle.objects.all())
 
         return render(request, self.template_name, {'vehicles': vehicles})
 

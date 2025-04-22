@@ -1,6 +1,7 @@
 from django.views.generic import FormView
 from django.apps import apps
 
+from vehicles.models import PHEVVehicle
 from .forms import VehicleSelectForm
 from calculator.engines.energy import EnergyCalculator
 from calculator.engines.emissions import EmissionsCalculator
@@ -31,6 +32,7 @@ class CalculateView(FormView):
         ICEVehicle = apps.get_model('vehicles', 'ICEVehicle')
         EVVehicle = apps.get_model('vehicles', 'EVVehicle')
         HEVVehicle = apps.get_model('vehicles', 'HEVVehicle')
+        PHEVVehicle = apps.get_model('vehicles', 'PHEVVehicle')
 
         if data['analysis_type'] == 'single':
             vehicles = []
@@ -55,7 +57,10 @@ class CalculateView(FormView):
                 avg_hev = self.create_average_vehicle(HEVVehicle, 'HEV')
                 if avg_hev:
                     vehicles.append(avg_hev)
-
+            if 'PHEV' in compare_types:
+                avg_phev = self.create_average_vehicle(PHEVVehicle, 'PHEV')
+                if avg_phev:
+                    vehicles.append(avg_phev)
         for vehicle in vehicles:
             distance = data['distance_km']
             energy_result = EnergyCalculator.calculate_energy_consumption(
@@ -88,53 +93,48 @@ class CalculateView(FormView):
         if not vehicles.exists():
             return None
 
-        numeric_fields = {
-            'ICEVehicle': [
-                'mass_kg', 'frontal_area_m2', 'drag_coefficient', 'rolling_coefficient',
-                'engine_efficiency', 'fuel_consumption_lp100km', 'co2_emissions_gl',
-                'transmission_ratio', 'production_price'
-            ],
-            'EVVehicle': [
-                'mass_kg', 'frontal_area_m2', 'drag_coefficient', 'rolling_coefficient',
-                'battery_capacity_kwh', 'energy_consumption_kwhp100km',
-                'motor_efficiency', 'charging_efficiency', 'production_price'
-            ],
-            'HEVVehicle': [
-                'mass_kg', 'frontal_area_m2', 'drag_coefficient', 'rolling_coefficient',
-                'engine_efficiency', 'fuel_consumption_lp100km', 'co2_emissions_gl',
-                'transmission_ratio', 'battery_capacity_kwh', 'energy_consumption_kwhp100km',
-                'motor_efficiency', 'charging_efficiency', 'ice_share',
-                'generator_efficiency', 'production_price'
-            ]
-        }
+        # числовые поля модели
+        numeric_fields = [
+            field.name for field in model._meta.get_fields()
+            if hasattr(field, 'get_internal_type') and
+               field.get_internal_type() in [
+                   'IntegerField', 'FloatField', 'DecimalField',
+                   'PositiveIntegerField', 'PositiveSmallIntegerField'
+               ] and
+               field.name not in ['id', 'created_at', 'updated_at']
+        ]
 
-        fields_to_avg = numeric_fields.get(model.__name__, [])
-        avg_values = {field: [] for field in fields_to_avg}
+        avg_values = {field: [] for field in numeric_fields}
         other_fields = {}
 
         for vehicle in vehicles:
-            for field in fields_to_avg:
+            for field in numeric_fields:
                 value = getattr(vehicle, field)
-                avg_values[field].append(value)
+                if value is not None:
+                    avg_values[field].append(value)
 
+            # Сохраняем нечисловые поля
             for field in vehicle._meta.fields:
                 field_name = field.name
-                if field_name not in fields_to_avg and field_name not in ['id', 'created_at', 'updated_at']:
-                    if field_name not in other_fields:
-                        other_fields[field_name] = getattr(vehicle, field_name)
+                if (field_name not in numeric_fields and
+                        field_name not in ['id', 'created_at', 'updated_at'] and
+                        field_name not in other_fields):
+                    other_fields[field_name] = getattr(vehicle, field_name)
 
+        # Вычисляем средние значения
         avg_fields = {}
         for field, values in avg_values.items():
             if values:
                 avg_fields[field] = sum(values) / len(values)
 
+        # нечисловые поля
         avg_fields.update(other_fields)
 
         avg_vehicle = model(**avg_fields)
         avg_vehicle.name = f"Average {vehicle_type} Vehicle (based on {len(vehicles)} models)"
-        avg_vehicle.id = -1
+        avg_vehicle.id = -1  # специальный ID для усредненного ТС
 
-        if model.__name__ == 'HEVVehicle' and 'ice_share' not in avg_fields:
-            avg_vehicle.ice_share = 0.5
+        if model.__name__ in ['HEVVehicle', 'PHEVVehicle'] and 'ice_share' not in avg_fields:
+            avg_vehicle.ice_share = 0.5  # Значение по умолчанию для гибридов
 
         return avg_vehicle

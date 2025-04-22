@@ -11,7 +11,6 @@
       "engine_efficiency": 0.35,
       "fuel_consumption_lp100km": 5.8,
       "co2_emissions_gl": 2300,
-      "transmission_ratio": 4.2,
       "production_price": 18000
     }
   },
@@ -43,7 +42,6 @@
       "engine_efficiency": 0.38,
       "fuel_consumption_lp100km": 4.7,
       "co2_emissions_gl": 2100,
-      "transmission_ratio": 3.9,
       "production_price": 22000
     }
   },
@@ -75,7 +73,6 @@
       "engine_efficiency": 0.36,
       "fuel_consumption_lp100km": 5.3,
       "co2_emissions_gl": 2200,
-      "transmission_ratio": 4.1,
       "battery_capacity_kwh": 1.6,
       "energy_consumption_kwhp100km": 5.5,
       "motor_efficiency": 0.90,
@@ -83,6 +80,30 @@
       "ice_share": 0.6,
       "generator_efficiency": 0.88,
       "production_price": 28000
+    }
+  },
+  {
+    "model": "vehicles.phevvehicle",
+    "fields": {
+      "name": "Mitsubishi Outlander PHEV",
+      "mass_kg": 1880,
+      "frontal_area_m2": 2.7,
+      "drag_coefficient": 0.33,
+      "rolling_coefficient": 0.016,
+      "road_type": "mixed",
+      "engine_efficiency": 0.37,
+      "fuel_consumption_lp100km": 6.0,
+      "co2_emissions_gl": 2100,
+      "battery_capacity_kwh": 20,
+      "energy_consumption_kwhp100km": 18,
+      "motor_efficiency": 0.92,
+      "charging_efficiency": 0.91,
+      "electric_range_km": 54,
+      "ice_range_km": 500,
+      "battery_depletion_threshold": 15.0,
+      "charging_power_kw": 3.7,
+      "regen_braking_efficiency": 0.75,
+      "production_price": 38000
     }
   },
   {
@@ -97,8 +118,31 @@
       "engine_efficiency": 0.32,
       "fuel_consumption_lp100km": 6.2,
       "co2_emissions_gl": 2400,
-      "transmission_ratio": 4.5,
       "production_price": 38000
+    }
+  },
+  {
+    "model": "vehicles.phevvehicle",
+    "fields": {
+      "name": "Volvo XC60 Recharge",
+      "mass_kg": 2130,
+      "frontal_area_m2": 2.8,
+      "drag_coefficient": 0.32,
+      "rolling_coefficient": 0.015,
+      "road_type": "mixed",
+      "engine_efficiency": 0.39,
+      "fuel_consumption_lp100km": 5.5,
+      "co2_emissions_gl": 1950,
+      "battery_capacity_kwh": 18.8,
+      "energy_consumption_kwhp100km": 22,
+      "motor_efficiency": 0.93,
+      "charging_efficiency": 0.92,
+      "electric_range_km": 48,
+      "ice_range_km": 520,
+      "battery_depletion_threshold": 20.0,
+      "charging_power_kw": 3.6,
+      "regen_braking_efficiency": 0.78,
+      "production_price": 55000
     }
   },
   {
@@ -118,6 +162,30 @@
     }
   },
   {
+    "model": "vehicles.phevvehicle",
+    "fields": {
+      "name": "Ford Escape PHEV",
+      "mass_kg": 1750,
+      "frontal_area_m2": 2.65,
+      "drag_coefficient": 0.31,
+      "rolling_coefficient": 0.014,
+      "road_type": "city",
+      "engine_efficiency": 0.38,
+      "fuel_consumption_lp100km": 5.2,
+      "co2_emissions_gl": 2000,
+      "battery_capacity_kwh": 14.4,
+      "energy_consumption_kwhp100km": 16,
+      "motor_efficiency": 0.91,
+      "charging_efficiency": 0.90,
+      "electric_range_km": 60,
+      "ice_range_km": 550,
+      "battery_depletion_threshold": 18.0,
+      "charging_power_kw": 3.3,
+      "regen_braking_efficiency": 0.72,
+      "production_price": 36000
+    }
+  },
+  {
     "model": "vehicles.icevehicle",
     "fields": {
       "name": "Audi A4 2.0 TDI",
@@ -129,8 +197,31 @@
       "engine_efficiency": 0.40,
       "fuel_consumption_lp100km": 4.9,
       "co2_emissions_gl": 1900,
-      "transmission_ratio": 4.0,
       "production_price": 40000
+    }
+  },
+  {
+    "model": "vehicles.phevvehicle",
+    "fields": {
+      "name": "BMW 330e",
+      "mass_kg": 1780,
+      "frontal_area_m2": 2.4,
+      "drag_coefficient": 0.26,
+      "rolling_coefficient": 0.012,
+      "road_type": "highway",
+      "engine_efficiency": 0.36,
+      "fuel_consumption_lp100km": 6.1,
+      "co2_emissions_gl": 2200,
+      "battery_capacity_kwh": 12,
+      "energy_consumption_kwhp100km": 15,
+      "motor_efficiency": 0.94,
+      "charging_efficiency": 0.93,
+      "electric_range_km": 42,
+      "ice_range_km": 480,
+      "battery_depletion_threshold": 20.0,
+      "charging_power_kw": 3.7,
+      "regen_braking_efficiency": 0.80,
+      "production_price": 47000
     }
   },
   {
@@ -145,7 +236,6 @@
       "engine_efficiency": 0.37,
       "fuel_consumption_lp100km": 5.1,
       "co2_emissions_gl": 2000,
-      "transmission_ratio": 3.8,
       "battery_capacity_kwh": 1.4,
       "energy_consumption_kwhp100km": 6.0,
       "motor_efficiency": 0.89,
@@ -172,6 +262,30 @@
     }
   },
   {
+    "model": "vehicles.phevvehicle",
+    "fields": {
+      "name": "Toyota RAV4 Prime",
+      "mass_kg": 1940,
+      "frontal_area_m2": 2.7,
+      "drag_coefficient": 0.34,
+      "rolling_coefficient": 0.015,
+      "road_type": "mixed",
+      "engine_efficiency": 0.40,
+      "fuel_consumption_lp100km": 5.8,
+      "co2_emissions_gl": 1900,
+      "battery_capacity_kwh": 18.1,
+      "energy_consumption_kwhp100km": 20,
+      "motor_efficiency": 0.93,
+      "charging_efficiency": 0.92,
+      "electric_range_km": 68,
+      "ice_range_km": 540,
+      "battery_depletion_threshold": 15.0,
+      "charging_power_kw": 3.3,
+      "regen_braking_efficiency": 0.75,
+      "production_price": 42000
+    }
+  },
+  {
     "model": "vehicles.icevehicle",
     "fields": {
       "name": "Mercedes-Benz C200",
@@ -183,7 +297,6 @@
       "engine_efficiency": 0.34,
       "fuel_consumption_lp100km": 6.0,
       "co2_emissions_gl": 2300,
-      "transmission_ratio": 4.3,
       "production_price": 42000
     }
   },
@@ -204,6 +317,30 @@
     }
   },
   {
+    "model": "vehicles.phevvehicle",
+    "fields": {
+      "name": "Chrysler Pacifica Hybrid",
+      "mass_kg": 2290,
+      "frontal_area_m2": 2.9,
+      "drag_coefficient": 0.36,
+      "rolling_coefficient": 0.017,
+      "road_type": "city",
+      "engine_efficiency": 0.35,
+      "fuel_consumption_lp100km": 7.0,
+      "co2_emissions_gl": 2300,
+      "battery_capacity_kwh": 16,
+      "energy_consumption_kwhp100km": 24,
+      "motor_efficiency": 0.90,
+      "charging_efficiency": 0.89,
+      "electric_range_km": 51,
+      "ice_range_km": 490,
+      "battery_depletion_threshold": 20.0,
+      "charging_power_kw": 3.6,
+      "regen_braking_efficiency": 0.70,
+      "production_price": 45000
+    }
+  },
+  {
     "model": "vehicles.hevvehicle",
     "fields": {
       "name": "Lexus NX 450h+",
@@ -215,7 +352,6 @@
       "engine_efficiency": 0.39,
       "fuel_consumption_lp100km": 5.0,
       "co2_emissions_gl": 1950,
-      "transmission_ratio": 3.9,
       "battery_capacity_kwh": 18,
       "energy_consumption_kwhp100km": 8.5,
       "motor_efficiency": 0.93,
@@ -237,7 +373,6 @@
       "engine_efficiency": 0.36,
       "fuel_consumption_lp100km": 5.5,
       "co2_emissions_gl": 2250,
-      "transmission_ratio": 4.0,
       "production_price": 23000
     }
   },
@@ -258,6 +393,30 @@
     }
   },
   {
+    "model": "vehicles.phevvehicle",
+    "fields": {
+      "name": "Mercedes GLC 300e",
+      "mass_kg": 2150,
+      "frontal_area_m2": 2.8,
+      "drag_coefficient": 0.31,
+      "rolling_coefficient": 0.014,
+      "road_type": "highway",
+      "engine_efficiency": 0.37,
+      "fuel_consumption_lp100km": 6.5,
+      "co2_emissions_gl": 2100,
+      "battery_capacity_kwh": 13.5,
+      "energy_consumption_kwhp100km": 19,
+      "motor_efficiency": 0.94,
+      "charging_efficiency": 0.93,
+      "electric_range_km": 43,
+      "ice_range_km": 510,
+      "battery_depletion_threshold": 20.0,
+      "charging_power_kw": 3.7,
+      "regen_braking_efficiency": 0.78,
+      "production_price": 58000
+    }
+  },
+  {
     "model": "vehicles.icevehicle",
     "fields": {
       "name": "Honda Civic 1.5 Turbo",
@@ -269,7 +428,6 @@
       "engine_efficiency": 0.37,
       "fuel_consumption_lp100km": 5.6,
       "co2_emissions_gl": 2200,
-      "transmission_ratio": 4.1,
       "production_price": 24000
     }
   },
@@ -285,7 +443,6 @@
       "engine_efficiency": 0.40,
       "fuel_consumption_lp100km": 4.2,
       "co2_emissions_gl": 1800,
-      "transmission_ratio": 3.7,
       "battery_capacity_kwh": 13,
       "energy_consumption_kwhp100km": 7.0,
       "motor_efficiency": 0.94,
@@ -312,6 +469,30 @@
     }
   },
   {
+    "model": "vehicles.phevvehicle",
+    "fields": {
+      "name": "Hyundai Santa Fe PHEV",
+      "mass_kg": 2020,
+      "frontal_area_m2": 2.85,
+      "drag_coefficient": 0.35,
+      "rolling_coefficient": 0.016,
+      "road_type": "mixed",
+      "engine_efficiency": 0.36,
+      "fuel_consumption_lp100km": 6.2,
+      "co2_emissions_gl": 2150,
+      "battery_capacity_kwh": 17.1,
+      "energy_consumption_kwhp100km": 21,
+      "motor_efficiency": 0.92,
+      "charging_efficiency": 0.91,
+      "electric_range_km": 48,
+      "ice_range_km": 530,
+      "battery_depletion_threshold": 18.0,
+      "charging_power_kw": 3.3,
+      "regen_braking_efficiency": 0.73,
+      "production_price": 44000
+    }
+  },
+  {
     "model": "vehicles.icevehicle",
     "fields": {
       "name": "Mazda CX-5 2.5 Turbo",
@@ -323,7 +504,6 @@
       "engine_efficiency": 0.33,
       "fuel_consumption_lp100km": 7.2,
       "co2_emissions_gl": 2500,
-      "transmission_ratio": 4.6,
       "production_price": 31000
     }
   },
@@ -355,7 +535,6 @@
       "engine_efficiency": 0.38,
       "fuel_consumption_lp100km": 5.4,
       "co2_emissions_gl": 2050,
-      "transmission_ratio": 4.0,
       "battery_capacity_kwh": 1.5,
       "energy_consumption_kwhp100km": 6.2,
       "motor_efficiency": 0.91,
@@ -377,7 +556,6 @@
       "engine_efficiency": 0.31,
       "fuel_consumption_lp100km": 7.5,
       "co2_emissions_gl": 2600,
-      "transmission_ratio": 4.8,
       "production_price": 33000
     }
   }

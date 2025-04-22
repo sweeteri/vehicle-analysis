@@ -1,4 +1,4 @@
-from vehicles.models import ICEVehicle, HEVVehicle, EVVehicle
+from vehicles.models import ICEVehicle, HEVVehicle, EVVehicle, PHEVVehicle
 
 
 class EnergyCalculator:
@@ -13,6 +13,7 @@ class EnergyCalculator:
     EV_EFFICIENCY = 0.9  # КПД электродвигателя (90%)
     GENERATOR_EFFICIENCY = 0.85  # КПД генератора (85%)
     CHARGING_EFFICIENCY = 0.9  # КПД зарядки (90%)
+    PHEV_ELECTRIC_RANGE_FACTOR = 0.7  # Коэффициент использования электрического диапазона PHEV
 
     @classmethod
     def calculate_energy_consumption(cls, vehicle, distance_km, driving_conditions='mixed'):
@@ -25,6 +26,8 @@ class EnergyCalculator:
             return cls._calculate_ev_energy(vehicle, distance_km, driving_conditions)
         elif isinstance(vehicle, HEVVehicle):
             return cls._calculate_hev_energy(vehicle, distance_km, driving_conditions)
+        elif isinstance(vehicle, PHEVVehicle):
+            return cls._calculate_phev_energy(vehicle, distance_km, driving_conditions)
         else:
             raise ValueError("Unsupported vehicle type")
 
@@ -82,6 +85,41 @@ class EnergyCalculator:
             'total_energy_mj': ice_energy + ev_energy,
             'ice_share': ice_share,
             'efficiency': cls._calculate_hev_efficiency(ice_share)
+        }
+
+    @classmethod
+    def _calculate_phev_energy(cls, vehicle, distance_km, driving_conditions):
+        """Расчет для подзаряжаемого гибрида (PHEV)"""
+        # Определяем часть пути, которая будет пройдена на электротяге
+        electric_range = vehicle.electric_range_km * cls.PHEV_ELECTRIC_RANGE_FACTOR
+        electric_distance = min(distance_km, electric_range)
+        ice_distance = max(0, distance_km - electric_distance)
+
+        # Расчет потребления для электрической части
+        ev_result = cls._calculate_ev_energy(vehicle, electric_distance, driving_conditions)
+
+        # Расчет потребления для ДВС части
+        ice_result = cls._calculate_ice_energy(vehicle, ice_distance, driving_conditions)
+
+        # Комбинируем результаты
+        total_energy_mj = ev_result['energy_mj'] + ice_result['energy_mj']
+        useful_energy_mj = (ev_result['useful_energy_mj'] +
+                            ice_result['useful_energy_mj'])
+
+        # Рассчитываем общий КПД
+        if total_energy_mj > 0:
+            efficiency = useful_energy_mj / total_energy_mj
+        else:
+            efficiency = cls.EV_EFFICIENCY if electric_distance > 0 else cls.ICE_EFFICIENCY
+
+        return {
+            'fuel_liters': ice_result['fuel_liters'],
+            'energy_kwh': ev_result['energy_kwh'],
+            'total_energy_mj': total_energy_mj,
+            'useful_energy_mj': useful_energy_mj,
+            'efficiency': efficiency,
+            'electric_share': electric_distance / distance_km if distance_km > 0 else 0,
+            'battery_depletion': ev_result['battery_depletion'] if electric_distance > 0 else 0
         }
 
     @classmethod

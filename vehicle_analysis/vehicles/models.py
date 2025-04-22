@@ -37,10 +37,6 @@ class EngineSpecs(models.Model):
         default=2300,  # Среднее значение для бензина
         null=True, blank=True
     )
-    transmission_ratio = models.FloatField(
-        verbose_name="Передаточное число трансмиссии",
-        null=True, blank=True
-    )
 
     class Meta:
         abstract = True
@@ -107,3 +103,38 @@ class HEVVehicle(BaseVehicle, EngineSpecs, ElectricSpecs):
 
     def __str__(self):
         return f"{self.name} (Гибрид)"
+
+
+class PHEVVehicle(BaseVehicle, EngineSpecs, ElectricSpecs):
+    """Модель для подключаемых гибридов (PHEV)"""
+    electric_range_km = models.FloatField(
+        verbose_name="Запас хода на электротяге (км)",
+        null=True, blank=True
+    )
+    ice_range_km = models.FloatField(
+        verbose_name="Запас хода на ДВС (км)",
+        null=True, blank=True
+    )
+    battery_depletion_threshold = models.FloatField(
+        verbose_name="Порог разряда батареи для перехода на ДВС (%)",
+        default=20.0,
+        help_text="Процент заряда батареи, при котором включается ДВС"
+    )
+    charging_power_kw = models.FloatField(
+        verbose_name="Мощность зарядки (кВт)",
+        null=True, blank=True,
+        help_text="Максимальная мощность зарядки от сети"
+    )
+    regen_braking_efficiency = models.FloatField(
+        verbose_name="КПД рекуперативного торможения",
+        default=0.7,
+        help_text="Эффективность восстановления энергии при торможении"
+    )
+
+    class Meta:
+        app_label = 'vehicles'
+        verbose_name = 'PHEV автомобиль'
+        verbose_name_plural = 'PHEV автомобили'
+
+    def __str__(self):
+        return f"{self.name} (Заряжаемый гибрид)"

@@ -1,8 +1,17 @@
 from django import forms
-from vehicles.models import ICEVehicle, EVVehicle, HEVVehicle, BaseVehicle
+from vehicles.models import ICEVehicle, EVVehicle, HEVVehicle, PHEVVehicle, BaseVehicle
 
 
 class VehicleSelectForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['ice_vehicle'].widget.attrs.update({'class': 'form-select w-100'})
+        self.fields['hevv_vehicle'].widget.attrs.update({'class': 'form-select w-100'})
+        self.fields['phevv_vehicle'].widget.attrs.update({'class': 'form-select w-100'})
+        self.fields['ev_vehicle'].widget.attrs.update({'class': 'form-select w-100'})
+        self.fields['energy_source'].widget.attrs.update({'class': 'form-select'})
+        self.fields['road_type'].widget.attrs.update({'class': 'form-select'})
+
     ANALYSIS_CHOICES = [
         ('single', 'Анализ одной машины'),
         ('type_avg', 'Сравнение по типу')
@@ -29,6 +38,12 @@ class VehicleSelectForm(forms.Form):
         queryset=HEVVehicle.objects.all(),
         required=False,
         label="Гибрид"
+    )
+
+    phevv_vehicle = forms.ModelChoiceField(
+        queryset=PHEVVehicle.objects.all(),
+        required=False,
+        label="Заряжаемый Гибрид"
     )
 
     energy_source = forms.ChoiceField(

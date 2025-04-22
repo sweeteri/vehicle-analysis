@@ -1,4 +1,4 @@
-from vehicles.models import ICEVehicle, EVVehicle, HEVVehicle
+from vehicles.models import ICEVehicle, EVVehicle, HEVVehicle, PHEVVehicle
 
 
 class TCOService:
@@ -15,6 +15,7 @@ class TCOService:
     DISPOSAL_COST_EV = 100000  # утилизация электромобиля (руб)
     FUEL_PRICE = 55  # руб/л (средняя цена бензина)
     ELECTRICITY_PRICE = 5  # руб/кВт·ч (средний тариф)
+    PHEV_ELECTRIC_RANGE_FACTOR = 0.8  # Коэффициент использования электрического диапазона
 
     @classmethod
     def calculate_tco(cls, vehicle, distance_km=None):
@@ -80,6 +81,8 @@ class TCOService:
             return cls._calculate_electricity_cost(vehicle, distance_km)
         elif isinstance(vehicle, HEVVehicle):
             return cls._calculate_hybrid_cost(vehicle, distance_km)
+        elif isinstance(vehicle, PHEVVehicle):
+            return cls._calculate_phev_cost(vehicle, distance_km)
         else:
             raise ValueError(f"Unsupported vehicle type: {type(vehicle)}")
 
@@ -102,6 +105,19 @@ class TCOService:
         ev_part = (1 - vehicle.ice_share) * cls._calculate_electricity_cost(vehicle, distance_km)
         return ice_part + ev_part
 
+    @classmethod
+    def _calculate_phev_cost(cls, vehicle, distance_km):
+        """Затраты на энергию для PHEV"""
+        # Определяем часть пути на электротяге
+        electric_range = vehicle.electric_range_km * cls.PHEV_ELECTRIC_RANGE_FACTOR
+        electric_distance = min(distance_km, electric_range)
+        ice_distance = max(0, distance_km - electric_range)
+
+        # Расчет затрат для каждой части
+        electricity_cost = cls._calculate_electricity_cost(vehicle, electric_distance)
+        fuel_cost = cls._calculate_fuel_cost(vehicle, ice_distance)
+
+        return electricity_cost + fuel_cost
     @classmethod
     def _calculate_maintenance_cost(cls, vehicle, distance_km):
         """Затраты на ТО"""

@@ -1,4 +1,4 @@
-from vehicles.models import ICEVehicle, HEVVehicle, EVVehicle
+from vehicles.models import ICEVehicle, HEVVehicle, EVVehicle, PHEVVehicle
 
 
 class EmissionsCalculator:
@@ -16,6 +16,7 @@ class EmissionsCalculator:
 
     # Коэффициенты выбросов ДВС (г/л бензина)
     ICE_EMISSION_FACTOR = 2300
+    PHEV_ELECTRIC_RANGE_FACTOR = 0.8  # Коэффициент использования электрического диапазона PHEV
 
     @classmethod
     def calculate_co2(cls, vehicle, distance_km, energy_source='eu_avg',
@@ -32,6 +33,11 @@ class EmissionsCalculator:
             )
         elif isinstance(vehicle, HEVVehicle):
             return cls._calculate_hev_co2(
+                vehicle, distance_km, energy_source,
+                use_recuperation, urban_share
+            )
+        elif isinstance(vehicle, PHEVVehicle):
+            return cls._calculate_phev_co2(
                 vehicle, distance_km, energy_source,
                 use_recuperation, urban_share
             )
@@ -71,6 +77,28 @@ class EmissionsCalculator:
             vehicle, distance_km, energy_source, use_recuperation, urban_share
         )
         return ice_emissions + ev_emissions
+
+    @classmethod
+    def _calculate_phev_co2(cls, vehicle, distance_km, energy_source,
+                            use_recuperation, urban_share):
+        """
+        Расчет выбросов для подзаряжаемого гибрида (PHEV)
+        """
+        # Определяем часть пути, которая будет пройдена на электротяге
+        electric_range = vehicle.electric_range_km * cls.PHEV_ELECTRIC_RANGE_FACTOR
+        electric_distance = min(distance_km, electric_range)
+        ice_distance = max(0, distance_km - electric_distance)
+
+        # Расчет выбросов для электрической части
+        ev_emissions = cls._calculate_ev_co2(
+            vehicle, electric_distance, energy_source,
+            use_recuperation, urban_share
+        )
+
+        # Расчет выбросов для ДВС части
+        ice_emissions = cls._calculate_ice_co2(vehicle, ice_distance)
+
+        return ev_emissions + ice_emissions
 
     @classmethod
     def get_energy_sources(cls):
