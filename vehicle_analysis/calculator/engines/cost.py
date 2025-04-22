@@ -17,6 +17,7 @@ class TCOService:
     ELECTRICITY_PRICE = 5  # руб/кВт·ч (средний тариф)
     PHEV_ELECTRIC_RANGE_FACTOR = 0.8  # Коэффициент использования электрического диапазона
 
+
     @classmethod
     def calculate_tco(cls, vehicle, distance_km=None):
         """

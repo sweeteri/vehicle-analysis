@@ -18,7 +18,10 @@ class VehicleListView(View):
         elif vehicle_type == 'PHEV':
             vehicles = PHEVVehicle.objects.all()
         else:
-            vehicles = list(ICEVehicle.objects.all()) + list(EVVehicle.objects.all()) + list(HEVVehicle.objects.all()) + list(PHEVVehicle.objects.all())
+            vehicles = (list(ICEVehicle.objects.all()) +
+                        list(EVVehicle.objects.all()) +
+                        list(HEVVehicle.objects.all()) +
+                        list(PHEVVehicle.objects.all()))
 
         return render(request, self.template_name, {'vehicles': vehicles})
 

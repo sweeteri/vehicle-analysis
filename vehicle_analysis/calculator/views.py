@@ -1,7 +1,6 @@
 from django.views.generic import FormView
 from django.apps import apps
 
-from vehicles.models import PHEVVehicle
 from .forms import VehicleSelectForm
 from calculator.engines.energy import EnergyCalculator
 from calculator.engines.emissions import EmissionsCalculator
@@ -98,10 +97,17 @@ class CalculateView(FormView):
             field.name for field in model._meta.get_fields()
             if hasattr(field, 'get_internal_type') and
                field.get_internal_type() in [
-                   'IntegerField', 'FloatField', 'DecimalField',
-                   'PositiveIntegerField', 'PositiveSmallIntegerField'
-               ] and
-               field.name not in ['id', 'created_at', 'updated_at']
+                   'IntegerField',
+                   'FloatField',
+                   'DecimalField',
+                   'PositiveIntegerField',
+                   'PositiveSmallIntegerField'
+               ]
+               and field.name not in [
+                   'id',
+                   'created_at',
+                   'updated_at'
+               ]
         ]
 
         avg_values = {field: [] for field in numeric_fields}
