@@ -94,20 +94,19 @@ class CalculateView(FormView):
 
         # числовые поля модели
         numeric_fields = [
-            field.name for field in model._meta.get_fields()
-            if hasattr(field, 'get_internal_type') and
-               field.get_internal_type() in [
-                   'IntegerField',
-                   'FloatField',
-                   'DecimalField',
-                   'PositiveIntegerField',
-                   'PositiveSmallIntegerField'
-               ]
-               and field.name not in [
-                   'id',
-                   'created_at',
-                   'updated_at'
-               ]
+            field.name
+            for field in model._meta.get_fields()
+            if (
+                    hasattr(field, 'get_internal_type')
+                    and field.get_internal_type() in [
+                        'IntegerField',
+                        'FloatField',
+                        'DecimalField',
+                        'PositiveIntegerField',
+                        'PositiveSmallIntegerField'
+                    ]
+                    and field.name not in ['id', 'created_at', 'updated_at']
+            )
         ]
 
         avg_values = {field: [] for field in numeric_fields}
