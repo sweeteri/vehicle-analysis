@@ -3,7 +3,8 @@ from django.db import models
 
 class BaseVehicle(models.Model):
     """Абстрактная модель с общими параметрами для всех авто"""
-    name = models.CharField(max_length=100, verbose_name="Название модели")
+    mark_name = models.CharField(max_length=120, verbose_name="Название марки", default='')
+    model_name = models.CharField(max_length=100, verbose_name="Название модели")
     mass_kg = models.FloatField(verbose_name="Масса (кг)")
     frontal_area_m2 = models.FloatField(verbose_name="Лобовая площадь (м²)")
     drag_coefficient = models.FloatField(verbose_name="Коэффициент аэродинамического сопротивления (Cx)")
@@ -73,7 +74,7 @@ class ICEVehicle(BaseVehicle, EngineSpecs):
         app_label = 'vehicles'
 
     def __str__(self):
-        return f"{self.name} (ДВС)"
+        return f"{self.mark_name} {self.model_name} (ДВС)"
 
 
 class EVVehicle(BaseVehicle, ElectricSpecs):
@@ -83,7 +84,7 @@ class EVVehicle(BaseVehicle, ElectricSpecs):
         app_label = 'vehicles'
 
     def __str__(self):
-        return f"{self.name} (Электромобиль)"
+        return f"{self.mark_name} {self.model_name} (Электромобиль)"
 
 
 class HEVVehicle(BaseVehicle, EngineSpecs, ElectricSpecs):
@@ -102,7 +103,7 @@ class HEVVehicle(BaseVehicle, EngineSpecs, ElectricSpecs):
         app_label = 'vehicles'
 
     def __str__(self):
-        return f"{self.name} (Гибрид)"
+        return f"{self.mark_name} {self.model_name} (Гибрид)"
 
 
 class PHEVVehicle(BaseVehicle, EngineSpecs, ElectricSpecs):
@@ -137,4 +138,4 @@ class PHEVVehicle(BaseVehicle, EngineSpecs, ElectricSpecs):
         verbose_name_plural = 'PHEV автомобили'
 
     def __str__(self):
-        return f"{self.name} (Заряжаемый гибрид)"
+        return f"{self.mark_name} {self.model_name} (Заряжаемый гибрид)"
