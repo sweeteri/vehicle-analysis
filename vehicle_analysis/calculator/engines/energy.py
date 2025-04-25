@@ -14,6 +14,7 @@ class EnergyCalculator:
     GENERATOR_EFFICIENCY = 0.85  # КПД генератора (85%)
     CHARGING_EFFICIENCY = 0.9  # КПД зарядки (90%)
     PHEV_ELECTRIC_RANGE_FACTOR = 0.7  # Коэффициент использования электрического диапазона PHEV
+    FUEL_ENERGY_DENSITY_MJ_PER_L = 34.5  # Энергетическая плотность топлива для бензина
 
     @classmethod
     def calculate_energy_consumption(cls, vehicle, distance_km, driving_conditions='mixed'):
@@ -68,23 +69,29 @@ class EnergyCalculator:
 
     @classmethod
     def _calculate_hev_energy(cls, vehicle, distance_km, driving_conditions):
-        """Расчет для гибрида"""
-        ice_share = cls._get_ice_share(vehicle, driving_conditions)
-        ice_result = cls._calculate_ice_energy(vehicle, distance_km, driving_conditions)
-        ev_result = cls._calculate_ev_energy(vehicle, distance_km, driving_conditions)
+        # Расчет энергии ДВС
+        fuel_used_liters = vehicle.fuel_consumption_lp100km * distance_km / 100
+        ice_energy_mj = fuel_used_liters * cls.FUEL_ENERGY_DENSITY_MJ_PER_L * vehicle.engine_efficiency
 
-        ice_energy = ice_result['energy_mj'] * ice_share
-        ev_energy = ev_result['energy_mj'] * (1 - ice_share)
+        # Расчет электроэнергии (рекуперация + заряд от ДВС)
+        if driving_conditions == "city":
+            ev_energy_kwh = 0.3 * (vehicle.mass_kg / 1500) * (distance_km / 100)
+            ice_share = 0.4
+        else:  # highway
+            ev_energy_kwh = 0.1 * (vehicle.mass_kg / 1500) * (distance_km / 100) * vehicle.engine_efficiency
+            ice_share = 0.8
 
-        if driving_conditions == 'highway':
-            ev_energy /= cls.GENERATOR_EFFICIENCY * cls.CHARGING_EFFICIENCY
+        ev_energy_mj = ev_energy_kwh * 3.6
+
+        # Общая энергия с учетом доли ДВС/электромотора
+        total_energy_mj = (ice_energy_mj * ice_share) + (ev_energy_mj * (1 - ice_share))
 
         return {
-            'fuel_liters': ice_result['fuel_liters'] * ice_share,
-            'energy_kwh': ev_result['energy_kwh'] * (1 - ice_share),
-            'total_energy_mj': ice_energy + ev_energy,
-            'ice_share': ice_share,
-            'efficiency': cls._calculate_hev_efficiency(ice_share)
+            "fuel_liters": fuel_used_liters * ice_share,
+            "energy_kwh": ev_energy_kwh * (1 - ice_share),
+            "total_energy_mj": total_energy_mj,
+            "ice_share": ice_share,
+            "efficiency": (vehicle.engine_efficiency * ice_share) + (cls.EV_EFFICIENCY * (1 - ice_share))
         }
 
     @classmethod

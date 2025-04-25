@@ -1,61 +1,63 @@
 {% extends "includes/base.html" %}
 
 {% block content %}
-<div class="container mt-4">
-  <h1 class="mb-4">Каталог автомобилей</h1>
-  <!-- Фильтры -->
-  <div class="card mb-4">
-    <div class="card-body">
-      <form method="get">
-        <div class="row">
-          <div class="col-md-3">
-            <label>Тип:</label>
-            <select name="type" class="form-select">
-              <option value="">Все</option>
-              <option value="ICE">ДВС</option>
-              <option value="EV">Электромобили</option>
-              <option value="HEV">Гибриды</option>
-              <option value="PHEV">Заряжаемые гибриды</option>
-            </select>
-          </div>
-          <div class="col-md-3">
-            <button type="submit" class="btn btn-primary mt-4">Фильтровать</button>
-          </div>
+    <div class="container mt-4">
+        <h1 class="mb-4">Каталог автомобилей</h1>
+        <!-- Фильтры -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <form method="get">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label>Тип:</label>
+                            <select name="type" class="form-select">
+                                <option value="">Все</option>
+                                <option value="ICE">ДВС</option>
+                                <option value="EV">Электромобили</option>
+                                <option value="HEV">Гибриды</option>
+                                <option value="PHEV">Заряжаемые гибриды</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <button type="submit" class="btn btn-primary mt-4">Фильтровать</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
         </div>
-      </form>
-    </div>
-  </div>
 
-  <!-- Таблица с авто -->
-  <div class="table-responsive">
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th>Модель</th>
-          <th>Масса (кг)</th>
-          <th>Расход</th>
-          <th>Подробнее</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for vehicle in vehicles %}
-        <tr>
-          <td>{{ vehicle.name }}</td>
-          <td>{{ vehicle.mass_kg }}</td>
-          <td>
-            {% if vehicle.vehicle_type == 'ICE' %}
-              {{ vehicle.fuel_consumption_lp100km }} л/100км
-            {% else %}
-              {{ vehicle.energy_consumption_kwhp100km }} кВт·ч/100км
-            {% endif %}
-          </td>
-          <td>
-            <a href="{% url 'vehicles:vehicle_detail' vehicle.id %}" class="btn btn-sm btn-info">Подробнее</a>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-</div>
+        <!-- Таблица с авто -->
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>Модель</th>
+                    <th>Масса (кг)</th>
+                    <th>Расход</th>
+                    <th>Подробнее</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for vehicle in vehicles %}
+                    <tr>
+                        <td>{{ vehicle.mark_name }} {{ vehicle.model_name }}</td>
+                        <td>{{ vehicle.mass_kg }}</td>
+                        <td>
+                            {% if vehicle.fuel_consumption_lp100km %}
+                                <li class="list-group-item">{{ vehicle.fuel_consumption_lp100km }}
+                                    л/100км
+                                </li>
+                            {% else %}
+                                {{ vehicle.energy_consumption_kwhp100km }} кВт·ч/100км
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'vehicles:vehicle_detail' vehicle.id %}" class="btn btn-sm btn-info">Подробнее</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 {% endblock %}

@@ -13,7 +13,6 @@
                         <ul class="list-group">
                             <li class="list-group-item">Масса: {{ vehicle.mass_kg }} кг</li>
                             <li class="list-group-item">Лобовая площадь: {{ vehicle.frontal_area_m2 }} м²</li>
-                            <li class="list-group-item">Cx: {{ vehicle.drag_coefficient }}</li>
                         </ul>
                     </div>
 
@@ -22,6 +21,12 @@
                             {% if vehicle.fuel_consumption_lp100km %}
                                 <li class="list-group-item">Расход топлива: {{ vehicle.fuel_consumption_lp100km }}
                                     л/100км
+                                </li>
+                            {% endif %}
+                            {% if vehicle.energy_consumption_kwhp100km %}
+                                <li class="list-group-item">Расход
+                                    электроэнергии: {{ vehicle.energy_consumption_lp100km }}
+                                    кВт·ч/100км
                                 </li>
                             {% endif %}
                             {% if vehicle.co2_emissions_gl %}

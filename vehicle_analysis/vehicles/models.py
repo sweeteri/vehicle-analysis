@@ -7,8 +7,6 @@ class BaseVehicle(models.Model):
     model_name = models.CharField(max_length=100, verbose_name="Название модели")
     mass_kg = models.FloatField(verbose_name="Масса (кг)")
     frontal_area_m2 = models.FloatField(verbose_name="Лобовая площадь (м²)")
-    drag_coefficient = models.FloatField(verbose_name="Коэффициент аэродинамического сопротивления (Cx)")
-    rolling_coefficient = models.FloatField(verbose_name="Коэффициент сопротивления качению (Cr)")
     production_price = models.FloatField(verbose_name='Стоимость производства', default=1000)
 
     ROAD_TYPES = (

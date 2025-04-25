@@ -32,7 +32,7 @@ class VehicleDetailView(View):
 
     def get(self, request, pk, *args, **kwargs):
         vehicle = None
-        for model in [ICEVehicle, EVVehicle]:
+        for model in [ICEVehicle, EVVehicle, HEVVehicle, PHEVVehicle]:
             try:
                 vehicle = model.objects.get(pk=pk)
                 break

@@ -74,6 +74,7 @@ class CalculateView(FormView):
             tco_result = TCOService.calculate_tco(
                 vehicle=vehicle,
                 distance_km=distance,
+                driving_conditions=(data['road_type'])
             )
 
             results.append({

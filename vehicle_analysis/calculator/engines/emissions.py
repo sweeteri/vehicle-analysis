@@ -34,7 +34,6 @@ class EmissionsCalculator:
         elif isinstance(vehicle, HEVVehicle):
             return cls._calculate_hev_co2(
                 vehicle, distance_km, energy_source,
-                use_recuperation, urban_share
             )
         elif isinstance(vehicle, PHEVVehicle):
             return cls._calculate_phev_co2(
@@ -68,15 +67,44 @@ class EmissionsCalculator:
         return total_energy * emission_factor
 
     @classmethod
-    def _calculate_hev_co2(cls, vehicle, distance_km, energy_source,
-                           use_recuperation, urban_share):
-        """Расчет выбросов для гибрида"""
-        ice_share = vehicle.ice_share  # Доля работы ДВС
-        ice_emissions = ice_share * cls._calculate_ice_co2(vehicle, distance_km)
-        ev_emissions = (1 - ice_share) * cls._calculate_ev_co2(
-            vehicle, distance_km, energy_source, use_recuperation, urban_share
-        )
-        return ice_emissions + ev_emissions
+    def _calculate_hev_co2(cls, vehicle, distance_km, driving_conditions):
+        """Расчёт выбросов CO₂ для гибрида (HEV) на основе:
+           - Расхода топлива (fuel_consumption_lp100km)
+           - Выбросов CO₂ на литр (co2_emissions_gl)
+           - КПД ДВС (engine_efficiency)
+           - Условий движения (city/highway)
+           - Массы (mass_kg) и лобовой площади (frontal_area_m2) для учёта аэродинамики.
+
+        Args:
+            vehicle: Объект с параметрами гибрида.
+            distance_km: Пройденное расстояние (км).
+            driving_conditions: 'city' или 'highway'.
+
+        Returns:
+            Выбросы CO₂ в граммах.
+        """
+        # 1. Определяем долю работы ДВС в зависимости от условий движения и параметров авто
+        if driving_conditions == "city":
+            # В городе доля ДВС ниже (активная рекуперация). Зависит от массы.
+            ice_share = 0.3 + (vehicle.mass_kg / 2000) * 0.1  # 30-40% для массы 1000-2000 кг
+        else:
+            # На трассе доля ДВС выше. Зависит от аэродинамики (frontal_area_m2).
+            c_d = 0.3  # Коэффициент лобового сопротивления (примерный)
+            air_resistance = vehicle.frontal_area_m2 * c_d
+            ice_share = 0.7 + (air_resistance / 0.7) * 0.2  # 70-90%
+
+        # 2. Расход топлива с учётом КПД ДВС и доли его работы
+        fuel_used_liters = (vehicle.fuel_consumption_lp100km * distance_km / 100) * ice_share
+        effective_fuel_used = fuel_used_liters / vehicle.engine_efficiency  # Коррекция на КПД
+
+        # 3. Выбросы CO₂ от сожжённого топлива
+        co2_emissions = effective_fuel_used * vehicle.co2_emissions_gl
+
+        # 4. Поправка на потери при зарядке батареи от ДВС (для трассы)
+        if driving_conditions == "highway":
+            co2_emissions *= 1.15  # +15% из-за КПД генератора и передачи энергии
+
+        return co2_emissions
 
     @classmethod
     def _calculate_phev_co2(cls, vehicle, distance_km, energy_source,
