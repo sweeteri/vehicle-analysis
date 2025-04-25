@@ -1,41 +1,41 @@
 {% if show_results %}
-<div class="mt-5 card shadow-sm">
-    <div class="card-header bg-success text-white">
-        <h4 class="my-0 fw-normal"><i class="fas fa-chart-bar me-2"></i>Результаты</h4>
-    </div>
-    <div class="card-body">
-        {% if results %}
-        <div class="table-responsive">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Тип</th>
-                        <th>Расход</th>
-                        <th>Выбросы CO₂</th>
-                        <th>Стоимость владения</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in results %}
-                    <tr>
-                        <td>{{ item.vehicle.name }}</td>
-                        <td>
-                            {% if item.energy_kwh %}
-                                {{ item.energy_kwh|floatformat:2 }} кВт·ч
-                            {% else %}
-                                {{ item.fuel_liters|floatformat:2 }} л
-                            {% endif %}
-                        </td>
-                        <td>{{ item.emissions|floatformat:2 }} г</td>
-                        <td>{{ item.tco|floatformat:2 }} руб</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+    <div class="mt-5 card shadow-sm">
+        <div class="card-header bg-success text-white">
+            <h4 class="my-0 fw-normal"><i class="fas fa-chart-bar me-2"></i>Результаты</h4>
         </div>
-        {% else %}
-        <div class="alert alert-warning">Нет данных для отображения</div>
-        {% endif %}
+        <div class="card-body">
+            {% if results %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>Тип</th>
+                            <th>Расход</th>
+                            <th>Выбросы CO₂</th>
+                            <th>Стоимость владения</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for item in results %}
+                            <tr>
+                                <td>{{ item.vehicle.mark_name }} {{ item.vehicle.model_name }}</td>
+                                <td>
+                                    {% if item.energy_kwh %}
+                                        {{ item.energy_kwh|floatformat:2 }} кВт·ч
+                                    {% else %}
+                                        {{ item.fuel_liters|floatformat:2 }} л
+                                    {% endif %}
+                                </td>
+                                <td>{{ item.emissions|floatformat:2 }} г</td>
+                                <td>{{ item.tco|floatformat:2 }} руб</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-warning">Нет данных для отображения</div>
+            {% endif %}
+        </div>
     </div>
-</div>
 {% endif %}
