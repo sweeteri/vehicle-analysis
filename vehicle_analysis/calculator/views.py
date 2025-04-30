@@ -144,8 +144,14 @@ class CalculateView(FormView):
         avg_fields.update(other_fields)
 
         avg_vehicle = model(**avg_fields)
-        avg_vehicle.mark_name = "Average "
-        avg_vehicle.model_name = f"{vehicle_type} Vehicle (based on {len(vehicles)} models)"
+        avg_vehicle.mark_name = "Средняя "
+        vehicle_types = {
+            'ICE': 'ДВС',
+            'EV': 'Электромобиль',
+            'HEV': 'Гибрид',
+            'PHEV': 'Заряжаемый гибрид'
+        }
+        avg_vehicle.model_name = f"{vehicle_types[vehicle_type]} машина (основана на {len(vehicles)} моделях)"
 
         avg_vehicle.id = -1  # специальный ID для усредненного ТС
 
