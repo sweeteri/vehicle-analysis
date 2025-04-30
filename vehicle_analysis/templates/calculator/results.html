@@ -1,41 +1,102 @@
 {% if show_results %}
-<div class="mt-5 card shadow-sm">
-    <div class="card-header bg-success text-white">
-        <h4 class="my-0 fw-normal"><i class="fas fa-chart-bar me-2"></i>Результаты</h4>
-    </div>
-    <div class="card-body">
-        {% if results %}
-        <div class="table-responsive">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Тип</th>
-                        <th>Расход</th>
-                        <th>Выбросы CO₂</th>
-                        <th>Стоимость владения</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in results %}
-                    <tr>
-                        <td>{{ item.vehicle.name }}</td>
-                        <td>
-                            {% if item.energy_kwh %}
-                                {{ item.energy_kwh|floatformat:2 }} кВт·ч
-                            {% else %}
-                                {{ item.fuel_liters|floatformat:2 }} л
-                            {% endif %}
-                        </td>
-                        <td>{{ item.emissions|floatformat:2 }} г</td>
-                        <td>{{ item.tco|floatformat:2 }} руб</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+    <div class="mt-5 card shadow-sm">
+        <div class="card-header bg-success text-white">
+            <h4 class="my-0 fw-normal"><i class="fas fa-chart-bar me-2"></i>Результаты</h4>
         </div>
-        {% else %}
-        <div class="alert alert-warning">Нет данных для отображения</div>
-        {% endif %}
+        <div class="card-body">
+            {% if results %}
+                <div class="table-responsive">
+                    <table class="table" id="resultsTable">
+                        <thead>
+                        <tr>
+                            <th>Тип</th>
+                            <th class="sortable" data-sort="consumption">Расход <span class="sort-arrow">↕</span></th>
+                            <th class="sortable" data-sort="emissions">Выбросы CO₂ <span class="sort-arrow">↕</span></th>
+                            <th class="sortable" data-sort="tco">Стоимость владения <span class="sort-arrow">↕</span></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for item in results %}
+                            <tr data-consumption="{% if item.energy_kwh %}{{ item.energy_kwh }}{% else %}{{ item.fuel_liters }}{% endif %}"
+                                data-emissions="{{ item.emissions }}"
+                                data-tco="{{ item.tco }}">
+                                <td>{{ item.vehicle.mark_name }} {{ item.vehicle.model_name }}</td>
+                                <td>
+                                    {% if item.energy_kwh %}
+                                        {{ item.energy_kwh|floatformat:2 }} кВт·ч
+                                    {% else %}
+                                        {{ item.fuel_liters|floatformat:2 }} л
+                                    {% endif %}
+                                </td>
+                                <td>{{ item.emissions|floatformat:2 }} г</td>
+                                <td>{{ item.tco|floatformat:2 }} руб</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const sortableHeaders = document.querySelectorAll('.sortable');
+                        
+                        sortableHeaders.forEach(header => {
+                            header.addEventListener('click', function() {
+                                const sortBy = this.getAttribute('data-sort');
+                                const table = document.getElementById('resultsTable');
+                                const tbody = table.querySelector('tbody');
+                                const rows = Array.from(tbody.querySelectorAll('tr'));
+                                const isAsc = this.classList.contains('asc');
+                                
+                                // Reset all headers
+                                sortableHeaders.forEach(h => {
+                                    h.classList.remove('asc', 'desc');
+                                    const arrow = h.querySelector('.sort-arrow');
+                                    arrow.innerHTML = '↕';
+                                });
+                                
+                                // Sort rows
+                                rows.sort((a, b) => {
+                                    const aValue = parseFloat(a.getAttribute(`data-${sortBy}`));
+                                    const bValue = parseFloat(b.getAttribute(`data-${sortBy}`));
+                                    
+                                    return isAsc ? aValue - bValue : bValue - aValue;
+                                });
+                                
+                                // Update arrow and class
+                                const arrow = this.querySelector('.sort-arrow');
+                                if (isAsc) {
+                                    this.classList.add('desc');
+                                    arrow.innerHTML = '↓';
+                                } else {
+                                    this.classList.add('asc');
+                                    arrow.innerHTML = '↑';
+                                }
+                                
+                                // Rebuild table
+                                rows.forEach(row => tbody.appendChild(row));
+                            });
+                        });
+                    });
+                </script>
+
+                <style>
+                    .sortable {
+                        cursor: pointer;
+                        user-select: none;
+                        position: relative;
+                    }
+                    .sortable:hover {
+                        background-color: #f8f9fa;
+                    }
+                    .sort-arrow {
+                        margin-left: 5px;
+                        font-size: 14px;
+                    }
+                </style>
+            {% else %}
+                <div class="alert alert-warning">Нет данных для отображения</div>
+            {% endif %}
+        </div>
     </div>
-</div>
 {% endif %}

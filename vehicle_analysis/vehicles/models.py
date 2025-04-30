@@ -7,8 +7,6 @@ class BaseVehicle(models.Model):
     model_name = models.CharField(max_length=100, verbose_name="Название модели")
     mass_kg = models.FloatField(verbose_name="Масса (кг)")
     frontal_area_m2 = models.FloatField(verbose_name="Лобовая площадь (м²)")
-    drag_coefficient = models.FloatField(verbose_name="Коэффициент аэродинамического сопротивления (Cx)")
-    rolling_coefficient = models.FloatField(verbose_name="Коэффициент сопротивления качению (Cr)")
     production_price = models.FloatField(verbose_name='Стоимость производства', default=1000)
 
     ROAD_TYPES = (
@@ -108,34 +106,29 @@ class HEVVehicle(BaseVehicle, EngineSpecs, ElectricSpecs):
 
 class PHEVVehicle(BaseVehicle, EngineSpecs, ElectricSpecs):
     """Модель для подключаемых гибридов (PHEV)"""
-    electric_range_km = models.FloatField(
-        verbose_name="Запас хода на электротяге (км)",
-        null=True, blank=True
+    battery_only_range_km = models.FloatField(
+        default=0.0,
+        verbose_name="Запас хода только на батарее (км)",
+        help_text="По данным производителя (WLTP или NEDC)"
     )
-    ice_range_km = models.FloatField(
-        verbose_name="Запас хода на ДВС (км)",
-        null=True, blank=True
+    mpg_gas_only = models.FloatField(
+        default=0.0,
+        verbose_name="MPG при работе только на ДВС",
+        help_text="Miles per gallon в режиме только ДВС"
     )
-    battery_depletion_threshold = models.FloatField(
-        verbose_name="Порог разряда батареи для перехода на ДВС (%)",
-        default=20.0,
-        help_text="Процент заряда батареи, при котором включается ДВС"
+    kwh_100_km_battery_only = models.FloatField(
+        default=0.0,
+        verbose_name="Потребление энергии (кВт·ч/100 км)",
+        help_text="В режиме только на батарее"
     )
-    charging_power_kw = models.FloatField(
-        verbose_name="Мощность зарядки (кВт)",
-        null=True, blank=True,
-        help_text="Максимальная мощность зарядки от сети"
-    )
-    regen_braking_efficiency = models.FloatField(
-        verbose_name="КПД рекуперативного торможения",
-        default=0.7,
-        help_text="Эффективность восстановления энергии при торможении"
-    )
+
+    engine_efficiency = None
+    fuel_consumption_lp100km = None
+    battery_capacity_kwh = None
+    energy_consumption_kwhp100km = None
 
     class Meta:
         app_label = 'vehicles'
-        verbose_name = 'PHEV автомобиль'
-        verbose_name_plural = 'PHEV автомобили'
 
     def __str__(self):
-        return f"{self.mark_name} {self.model_name} (Заряжаемый гибрид)"
+        return f"{self.mark_name} {self.model_name} (PHEV)"

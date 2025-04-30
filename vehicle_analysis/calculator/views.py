@@ -41,13 +41,18 @@ class CalculateView(FormView):
                 vehicles.append(data['ev_vehicle'])
             if data.get('hevv_vehicle'):
                 vehicles.append(data['hevv_vehicle'])
+            if data.get('phevv_vehicle'):
+                vehicles.append(data['phevv_vehicle'])
         else:
             compare_types = self.request.POST.getlist('compare_types', [])
             vehicles = []
             if 'ICE' in compare_types:
+
                 avg_ice = self.create_average_vehicle(ICEVehicle, 'ICE')
+
                 if avg_ice:
                     vehicles.append(avg_ice)
+
             if 'EV' in compare_types:
                 avg_ev = self.create_average_vehicle(EVVehicle, 'EV')
                 if avg_ev:
@@ -60,6 +65,7 @@ class CalculateView(FormView):
                 avg_phev = self.create_average_vehicle(PHEVVehicle, 'PHEV')
                 if avg_phev:
                     vehicles.append(avg_phev)
+
         for vehicle in vehicles:
             distance = data['distance_km']
             energy_result = EnergyCalculator.calculate_energy_consumption(
@@ -74,6 +80,7 @@ class CalculateView(FormView):
             tco_result = TCOService.calculate_tco(
                 vehicle=vehicle,
                 distance_km=distance,
+                driving_conditions=(data['road_type'])
             )
 
             results.append({
@@ -83,11 +90,11 @@ class CalculateView(FormView):
                 'emissions': emissions_result,
                 'tco': tco_result['tco_total'],
             })
-
         return results
 
     def create_average_vehicle(self, model, vehicle_type):
         """Создает виртуальное транспортное средство с усредненными характеристиками"""
+
         vehicles = model.objects.all()
         if not vehicles.exists():
             return None
@@ -136,10 +143,17 @@ class CalculateView(FormView):
         avg_fields.update(other_fields)
 
         avg_vehicle = model(**avg_fields)
-        avg_vehicle.name = f"Average {vehicle_type} Vehicle (based on {len(vehicles)} models)"
+        avg_vehicle.mark_name = "Средняя "
+        vehicle_types = {
+            'ICE': 'ДВС',
+            'EV': 'Электромобиль',
+            'HEV': 'Гибрид',
+            'PHEV': 'Заряжаемый гибрид'
+        }
+        avg_vehicle.model_name = f"{vehicle_types[vehicle_type]} машина (основана на {len(vehicles)} моделях)"
+
         avg_vehicle.id = -1  # специальный ID для усредненного ТС
 
-        if model.__name__ in ['HEVVehicle', 'PHEVVehicle'] and 'ice_share' not in avg_fields:
+        if model.__name__ in ['HEVVehicle'] and 'ice_share' not in avg_fields:
             avg_vehicle.ice_share = 0.5  # Значение по умолчанию для гибридов
-
         return avg_vehicle
