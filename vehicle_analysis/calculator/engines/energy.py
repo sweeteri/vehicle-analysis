@@ -94,39 +94,43 @@ class EnergyCalculator:
             "efficiency": (vehicle.engine_efficiency * ice_share) + (cls.EV_EFFICIENCY * (1 - ice_share))
         }
 
-    @classmethod
-    def _calculate_phev_energy(cls, vehicle, distance_km, driving_conditions):
-        """Расчет для подзаряжаемого гибрида (PHEV)"""
-        # Определяем часть пути, которая будет пройдена на электротяге
-        electric_range = vehicle.electric_range_km * cls.PHEV_ELECTRIC_RANGE_FACTOR
-        electric_distance = min(distance_km, electric_range)
-        ice_distance = max(0, distance_km - electric_distance)
+    def _calculate_phev_energy(vehicle, distance_km, driving_conditions):
+        """Расчет энергопотребления для PHEV"""
+        electric_range_km = vehicle.battery_only_range_km
 
-        # Расчет потребления для электрической части
-        ev_result = cls._calculate_ev_energy(vehicle, electric_distance, driving_conditions)
+        # Расчет расстояний на электротяге и ДВС
+        electric_distance = min(distance_km, electric_range_km)
+        ice_distance = max(0, distance_km - electric_range_km)
 
-        # Расчет потребления для ДВС части
-        ice_result = cls._calculate_ice_energy(vehicle, ice_distance, driving_conditions)
+        # Расчет потребления электроэнергии (кВтч)
+        electric_consumption_kwh = (vehicle.kwh_100_km_battery_only / 100) * electric_distance
 
-        # Комбинируем результаты
-        total_energy_mj = ev_result['energy_mj'] + ice_result['energy_mj']
-        useful_energy_mj = (ev_result['useful_energy_mj'] +
-                            ice_result['useful_energy_mj'])
+        # Конвертация MPG в л/100км для расчета расхода топлива
+        fuel_consumption_l_100km = 235.214583 / vehicle.mpg_gas_only
+        fuel_consumption_liters = (fuel_consumption_l_100km / 100) * ice_distance
 
-        # Рассчитываем общий КПД
-        if total_energy_mj > 0:
-            efficiency = useful_energy_mj / total_energy_mj
-        else:
-            efficiency = cls.EV_EFFICIENCY if electric_distance > 0 else cls.ICE_EFFICIENCY
+        # Расчет энергии (1 кВт·ч = 3.6 МДж, 1 л бензина ≈ 32 МДж)
+        electric_energy_mj = electric_consumption_kwh * 3.6
+        fuel_energy_mj = fuel_consumption_liters * 32
+
+        # Общая энергия (без учета КПД)
+        total_energy_mj = electric_energy_mj + fuel_energy_mj
+
+        mpge = 0
+        if distance_km > 0:
+            electric_ratio = electric_distance / distance_km
+            mpge_ev = 100 / (vehicle.kwh_100_km_battery_only / 337)
+            mpge = 1 / ((electric_ratio / mpge_ev) + ((1 - electric_ratio) / vehicle.mpg_gas_only))
 
         return {
-            'fuel_liters': ice_result['fuel_liters'],
-            'energy_kwh': ev_result['energy_kwh'],
+            'fuel_liters': fuel_consumption_liters,
+            'energy_kwh': electric_consumption_kwh,
             'total_energy_mj': total_energy_mj,
-            'useful_energy_mj': useful_energy_mj,
-            'efficiency': efficiency,
             'electric_share': electric_distance / distance_km if distance_km > 0 else 0,
-            'battery_depletion': ev_result['battery_depletion'] if electric_distance > 0 else 0
+            'MPGe': mpge,
+            'electric_distance_km': electric_distance,
+            'ice_distance_km': ice_distance,
+            'fuel_consumption_l_100km': fuel_consumption_l_100km
         }
 
     @classmethod

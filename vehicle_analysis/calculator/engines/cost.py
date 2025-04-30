@@ -82,7 +82,7 @@ class TCOService:
         elif isinstance(vehicle, HEVVehicle):
             return cls._calculate_hybrid_cost(vehicle, distance_km, driving_conditions)
         elif isinstance(vehicle, PHEVVehicle):
-            return cls._calculate_phev_cost(vehicle, distance_km)
+            return cls._calculate_phev_cost(vehicle, distance_km, driving_conditions)
         else:
             raise ValueError(f"Unsupported vehicle type: {type(vehicle)}")
 
@@ -130,18 +130,46 @@ class TCOService:
         return fuel_cost
 
     @classmethod
-    def _calculate_phev_cost(cls, vehicle, distance_km):
-        """Затраты на энергию для PHEV"""
-        # Определяем часть пути на электротяге
-        electric_range = vehicle.electric_range_km * cls.PHEV_ELECTRIC_RANGE_FACTOR
-        electric_distance = min(distance_km, electric_range)
-        ice_distance = max(0, distance_km - electric_range)
+    def _calculate_phev_cost(cls, vehicle, distance_km, driving_conditions):
+        """
+        Расчет стоимости поездки на PHEV в рублях с учетом типа дороги
+        :param vehicle: объект PHEV с параметрами:
+            - battery_only_range_km: запас хода на электротяге (км)
+            - mpg_gas_only: расход в режиме ДВС (миль на галлон)
+            - kwh_100_km_battery_only: потребление энергии (кВтч/100км)
+        :param distance_km: пробег (км)
+        :param driving_conditions: тип дороги ('city', 'highway', 'mixed')
+        :return: словарь с детализацией расходов
+        """
+        # Коэффициенты влияния типа дороги на расход
+        ROAD_TYPE_FACTORS = {
+            'city': {'electric': 1.2, 'fuel': 1.3},  # Городской цикл (частые остановки)
+            'highway': {'electric': 0.9, 'fuel': 0.85},  # Трасса (равномерное движение)
+            'mixed': {'electric': 1.0, 'fuel': 1.0}  # Смешанный режим
+        }
 
-        # Расчет затрат для каждой части
-        electricity_cost = cls._calculate_electricity_cost(vehicle, electric_distance)
-        fuel_cost = cls._calculate_fuel_cost(vehicle, ice_distance)
+        ELECTRICITY_PRICE_RUB = 5.0  # руб/кВт·ч
+        FUEL_PRICE_RUB = 55.0  # руб/литр
 
-        return electricity_cost + fuel_cost
+        factors = ROAD_TYPE_FACTORS.get(driving_conditions, ROAD_TYPE_FACTORS['mixed'])
+
+        # Разделяем пробег на электротяге и ДВС
+        electric_range_km = vehicle.battery_only_range_km * factors['electric']
+        electric_distance = min(distance_km, electric_range_km)
+        ice_distance = max(0, distance_km - electric_range_km)
+
+        # Расчет потребления с учетом типа дороги
+        electric_consumption_kwh = (vehicle.kwh_100_km_battery_only / 100) * electric_distance * factors['electric']
+
+        # Конвертация MPG в л/100км с поправкой на тип дороги
+        fuel_consumption_l_100km = (235.214583 / vehicle.mpg_gas_only) * factors['fuel']
+        fuel_consumption_liters = (fuel_consumption_l_100km / 100) * ice_distance
+
+        # Расчет стоимости
+        electricity_cost_rub = electric_consumption_kwh * ELECTRICITY_PRICE_RUB
+        fuel_cost_rub = fuel_consumption_liters * FUEL_PRICE_RUB
+
+        return electricity_cost_rub + fuel_cost_rub
 
     @classmethod
     def _calculate_maintenance_cost(cls, vehicle, distance_km):
@@ -150,7 +178,7 @@ class TCOService:
             return distance_km * cls.MAINTENANCE_COST_ICE
         elif isinstance(vehicle, EVVehicle):
             return distance_km * cls.MAINTENANCE_COST_EV
-        elif isinstance(vehicle, HEVVehicle):
+        elif isinstance(vehicle, HEVVehicle) or isinstance(vehicle, PHEVVehicle):
             return distance_km * (cls.MAINTENANCE_COST_ICE + cls.MAINTENANCE_COST_EV) / 2
         else:
             return 0
@@ -162,7 +190,7 @@ class TCOService:
             return cls.DISPOSAL_COST_EV
         elif isinstance(vehicle, ICEVehicle):
             return cls.DISPOSAL_COST_ICE
-        elif isinstance(vehicle, HEVVehicle):
+        elif isinstance(vehicle, HEVVehicle) or isinstance(vehicle, PHEVVehicle):
             return (cls.DISPOSAL_COST_ICE + cls.DISPOSAL_COST_EV) / 2
         else:
             return 0

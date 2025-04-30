@@ -24,7 +24,6 @@ class CalculateView(FormView):
             'results': results,
             'show_results': True
         })
-        print("Form data: %s", form.cleaned_data)
         return self.render_to_response(context)
 
     def calculate_results(self, data):
@@ -48,9 +47,9 @@ class CalculateView(FormView):
             compare_types = self.request.POST.getlist('compare_types', [])
             vehicles = []
             if 'ICE' in compare_types:
-                print('hi from first average')
+
                 avg_ice = self.create_average_vehicle(ICEVehicle, 'ICE')
-                print('hi from second average')
+
                 if avg_ice:
                     vehicles.append(avg_ice)
 
@@ -155,7 +154,6 @@ class CalculateView(FormView):
 
         avg_vehicle.id = -1  # специальный ID для усредненного ТС
 
-        if model.__name__ in ['HEVVehicle', 'PHEVVehicle'] and 'ice_share' not in avg_fields:
+        if model.__name__ in ['HEVVehicle'] and 'ice_share' not in avg_fields:
             avg_vehicle.ice_share = 0.5  # Значение по умолчанию для гибридов
-        print(avg_vehicle)
         return avg_vehicle

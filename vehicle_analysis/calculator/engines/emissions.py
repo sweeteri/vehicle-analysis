@@ -38,7 +38,6 @@ class EmissionsCalculator:
         elif isinstance(vehicle, PHEVVehicle):
             return cls._calculate_phev_co2(
                 vehicle, distance_km, energy_source,
-                use_recuperation, urban_share
             )
         else:
             raise ValueError(f"Unsupported vehicle type: {type(vehicle)}")
@@ -107,26 +106,36 @@ class EmissionsCalculator:
         return co2_emissions
 
     @classmethod
-    def _calculate_phev_co2(cls, vehicle, distance_km, energy_source,
-                            use_recuperation, urban_share):
+    def _calculate_phev_co2(cls, vehicle, distance_km, energy_source):
         """
-        Расчет выбросов для подзаряжаемого гибрида (PHEV)
+        Расчет выбросов CO2 для PHEV (все в км и литрах)
+        :param vehicle: объект PHEV с параметрами:
+            - battery_only_range_km: запас хода на электротяге (км)
+            - mpg_gas_only: расход в режиме ДВС (миль на галлон)
+            - kwh_100_km_battery_only: потребление энергии (кВтч/100км)
+        :param distance_km: общий пробег (км)
+        :param electricity_co2_per_kwh: выбросы электроэнергии (кг CO2/кВтч)
+        :return: суммарные выбросы CO2 (кг)
         """
-        # Определяем часть пути, которая будет пройдена на электротяге
-        electric_range = vehicle.electric_range_km * cls.PHEV_ELECTRIC_RANGE_FACTOR
-        electric_distance = min(distance_km, electric_range)
-        ice_distance = max(0, distance_km - electric_distance)
+        # пробег на электротяге и ДВС (в км)
+        electricity_co2_per_kwh = 0.5
+        electric_range_km = vehicle.battery_only_range_km
+        electric_distance = min(distance_km, electric_range_km)
+        ice_distance = max(0, distance_km - electric_range_km)
 
-        # Расчет выбросов для электрической части
-        ev_emissions = cls._calculate_ev_co2(
-            vehicle, electric_distance, energy_source,
-            use_recuperation, urban_share
-        )
+        # Расчет потребления электроэнергии (кВтч)
+        electric_consumption_kwh = (vehicle.kwh_100_km_battery_only / 100) * electric_distance
 
-        # Расчет выбросов для ДВС части
-        ice_emissions = cls._calculate_ice_co2(vehicle, ice_distance)
+        # Расчет потребления топлива (л)
+        # Конвертируем MPG в л/100км: 235.214583 / MPG
+        fuel_consumption_l_100km = 235.214583 / vehicle.mpg_gas_only
+        fuel_consumption_liters = (fuel_consumption_l_100km / 100) * ice_distance
 
-        return ev_emissions + ice_emissions
+        # Расчет выбросов (кг CO2)
+        electric_co2 = float(electric_consumption_kwh) * float(electricity_co2_per_kwh)  # кг
+        fuel_co2 = float(fuel_consumption_liters) * 2.31  # 2.31 кг CO2 на литр бензина
+
+        return electric_co2 + fuel_co2
 
     @classmethod
     def get_energy_sources(cls):

@@ -32,9 +32,8 @@ class PHEVVehicleAdmin(ImportExportModelAdmin):
     list_display = (
         'mark_name',
         'model_name',
-        'electric_range_km',
-        'ice_range_km',
-        'battery_depletion_threshold',
-        'charging_power_kw',
-        'regen_braking_efficiency'
+        'battery_only_range_km',
+        'energy_consumption_kwhp100km',
+        'kwh_100_km_battery_only',
+        'frontal_area_m2'
     )
