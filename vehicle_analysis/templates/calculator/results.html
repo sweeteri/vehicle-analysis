@@ -11,13 +11,16 @@
                         <tr>
                             <th>Тип</th>
                             <th class="sortable" data-sort="consumption">Расход <span class="sort-arrow">↕</span></th>
-                            <th class="sortable" data-sort="emissions">Выбросы CO₂ <span class="sort-arrow">↕</span></th>
-                            <th class="sortable" data-sort="tco">Стоимость владения <span class="sort-arrow">↕</span></th>
+                            <th class="sortable" data-sort="emissions">Выбросы CO₂ <span class="sort-arrow">↕</span>
+                            </th>
+                            <th class="sortable" data-sort="tco">Стоимость владения <span class="sort-arrow">↕</span>
+                            </th>
                         </tr>
                         </thead>
                         <tbody>
                         {% for item in results %}
-                            <tr data-consumption="{% if item.energy_kwh %}{{ item.energy_kwh }}{% else %}{{ item.fuel_liters }}{% endif %}"
+                            <tr data-consumption="
+                                    {% if item.energy_kwh %}{{ item.energy_kwh }}{% else %}{{ item.fuel_liters }}{% endif %}"
                                 data-emissions="{{ item.emissions }}"
                                 data-tco="{{ item.tco }}">
                                 <td>{{ item.vehicle.mark_name }} {{ item.vehicle.model_name }}</td>
@@ -36,64 +39,9 @@
                     </table>
                 </div>
 
-                <script>
-                    document.addEventListener('DOMContentLoaded', function() {
-                        const sortableHeaders = document.querySelectorAll('.sortable');
-                        
-                        sortableHeaders.forEach(header => {
-                            header.addEventListener('click', function() {
-                                const sortBy = this.getAttribute('data-sort');
-                                const table = document.getElementById('resultsTable');
-                                const tbody = table.querySelector('tbody');
-                                const rows = Array.from(tbody.querySelectorAll('tr'));
-                                const isAsc = this.classList.contains('asc');
-                                
-                                // Reset all headers
-                                sortableHeaders.forEach(h => {
-                                    h.classList.remove('asc', 'desc');
-                                    const arrow = h.querySelector('.sort-arrow');
-                                    arrow.innerHTML = '↕';
-                                });
-                                
-                                // Sort rows
-                                rows.sort((a, b) => {
-                                    const aValue = parseFloat(a.getAttribute(`data-${sortBy}`));
-                                    const bValue = parseFloat(b.getAttribute(`data-${sortBy}`));
-                                    
-                                    return isAsc ? aValue - bValue : bValue - aValue;
-                                });
-                                
-                                // Update arrow and class
-                                const arrow = this.querySelector('.sort-arrow');
-                                if (isAsc) {
-                                    this.classList.add('desc');
-                                    arrow.innerHTML = '↓';
-                                } else {
-                                    this.classList.add('asc');
-                                    arrow.innerHTML = '↑';
-                                }
-                                
-                                // Rebuild table
-                                rows.forEach(row => tbody.appendChild(row));
-                            });
-                        });
-                    });
-                </script>
-
-                <style>
-                    .sortable {
-                        cursor: pointer;
-                        user-select: none;
-                        position: relative;
-                    }
-                    .sortable:hover {
-                        background-color: #f8f9fa;
-                    }
-                    .sort-arrow {
-                        margin-left: 5px;
-                        font-size: 14px;
-                    }
-                </style>
+                {% load static %}
+                <link rel="stylesheet" href="{% static 'calculator/css/table_styles.css' %}">
+                <script src="{% static 'calculator/js/table_sort.js' %}"></script>
             {% else %}
                 <div class="alert alert-warning">Нет данных для отображения</div>
             {% endif %}

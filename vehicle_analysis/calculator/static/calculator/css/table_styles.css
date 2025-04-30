@@ -1,0 +1,14 @@
+.sortable {
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+}
+
+.sortable:hover {
+    background-color: #f8f9fa;
+}
+
+.sort-arrow {
+    margin-left: 5px;
+    font-size: 14px;
+}

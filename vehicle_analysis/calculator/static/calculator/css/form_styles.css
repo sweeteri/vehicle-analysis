@@ -1,0 +1,25 @@
+/* Стили для карточек выбора автомобилей */
+.card-hoverable {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card-hoverable:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Стили для переключателей */
+.form-switch .form-check-input {
+    width: 2.5em;
+    height: 1.5em;
+    margin-top: 0.1em;
+}
+
+/* Анимация кнопки расчета */
+.btn-calculate {
+    transition: all 0.3s;
+}
+
+.btn-calculate:hover {
+    transform: scale(1.05);
+}
