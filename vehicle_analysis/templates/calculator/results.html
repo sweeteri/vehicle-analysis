@@ -1,26 +1,43 @@
 {% if show_results %}
-    <div class="mt-5 card shadow-sm">
-        <div class="card-header bg-success text-white">
-            <h4 class="my-0 fw-normal"><i class="fas fa-chart-bar me-2"></i>Результаты</h4>
-        </div>
-        <div class="card-body">
-            {% if results %}
-                <div class="table-responsive">
-                    <table class="table" id="resultsTable">
-                        <thead>
+<div class="mt-5 card shadow-sm">
+    <div class="card-header bg-success text-white">
+        <h4 class="my-0 fw-normal"><i class="fas fa-chart-bar me-2"></i>Результаты</h4>
+    </div>
+    <div class="card-body">
+        {% if results %}
+            <!-- Графики -->
+            <div class="row mb-4 g-3">
+                <div class="col-lg-12">
+                    <div class="chart-container p-3 bg-white rounded shadow-sm">
+                        {{ plots.consumption|safe }}
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="chart-container p-3 bg-white rounded shadow-sm">
+                        {{ plots.emissions|safe }}
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="chart-container p-3 bg-white rounded shadow-sm">
+                        {{ plots.cost|safe }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Таблица -->
+            <div class="table-responsive mt-4">
+                <table class="table table-hover" id="resultsTable">
+                    <thead class="table-light">
                         <tr>
                             <th>Тип</th>
                             <th class="sortable" data-sort="consumption">Расход <span class="sort-arrow">↕</span></th>
-                            <th class="sortable" data-sort="emissions">Выбросы CO₂ <span class="sort-arrow">↕</span>
-                            </th>
-                            <th class="sortable" data-sort="tco">Стоимость владения <span class="sort-arrow">↕</span>
-                            </th>
+                            <th class="sortable" data-sort="emissions">Выбросы CO₂ <span class="sort-arrow">↕</span></th>
+                            <th class="sortable" data-sort="tco">Стоимость владения <span class="sort-arrow">↕</span></th>
                         </tr>
-                        </thead>
-                        <tbody>
+                    </thead>
+                    <tbody>
                         {% for item in results %}
-                            <tr data-consumption="
-                                    {% if item.energy_kwh %}{{ item.energy_kwh }}{% else %}{{ item.fuel_liters }}{% endif %}"
+                            <tr data-consumption="{% if item.energy_kwh %}{{ item.energy_kwh }}{% else %}{{ item.fuel_liters }}{% endif %}"
                                 data-emissions="{{ item.emissions }}"
                                 data-tco="{{ item.tco }}">
                                 <td>{{ item.vehicle.mark_name }} {{ item.vehicle.model_name }}</td>
@@ -35,16 +52,29 @@
                                 <td>{{ item.tco|floatformat:2 }} руб</td>
                             </tr>
                         {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+                    </tbody>
+                </table>
+            </div>
 
-                {% load static %}
-                <link rel="stylesheet" href="{% static 'calculator/css/table_styles.css' %}">
-                <script src="{% static 'calculator/js/table_sort.js' %}"></script>
-            {% else %}
-                <div class="alert alert-warning">Нет данных для отображения</div>
-            {% endif %}
-        </div>
+            {% load static %}
+            <link rel="stylesheet" href="{% static 'calculator/css/table_styles.css' %}">
+            <script src="{% static 'calculator/js/table_sort.js' %}"></script>
+        {% else %}
+            <div class="alert alert-warning">Нет данных для отображения</div>
+        {% endif %}
     </div>
+</div>
+
+<style>
+    .chart-container {
+        height: 400px;
+        margin-bottom: 15px;
+        border: 1px solid #dee2e6;
+    }
+    @media (max-width: 768px) {
+        .chart-container {
+            height: 300px;
+        }
+    }
+</style>
 {% endif %}
