@@ -1,5 +1,8 @@
 from django.views.generic import FormView
 from django.apps import apps
+import plotly.express as px
+from plotly.offline import plot
+import pandas as pd
 
 from .forms import VehicleSelectForm
 from calculator.engines.energy import EnergyCalculator
@@ -20,9 +23,14 @@ class CalculateView(FormView):
     def form_valid(self, form):
         results = self.calculate_results(form.cleaned_data)
         context = self.get_context_data(form=form)
+
+        # Создаем графики
+        graphs = self.create_plots(results) if results else None
+
         context.update({
             'results': results,
-            'show_results': True
+            'show_results': True,
+            'plots': graphs
         })
         return self.render_to_response(context)
 
@@ -47,12 +55,9 @@ class CalculateView(FormView):
             compare_types = self.request.POST.getlist('compare_types', [])
             vehicles = []
             if 'ICE' in compare_types:
-
                 avg_ice = self.create_average_vehicle(ICEVehicle, 'ICE')
-
                 if avg_ice:
                     vehicles.append(avg_ice)
-
             if 'EV' in compare_types:
                 avg_ev = self.create_average_vehicle(EVVehicle, 'EV')
                 if avg_ev:
@@ -93,27 +98,17 @@ class CalculateView(FormView):
         return results
 
     def create_average_vehicle(self, model, vehicle_type):
-        """Создает виртуальное транспортное средство с усредненными характеристиками"""
-
         vehicles = model.objects.all()
         if not vehicles.exists():
             return None
 
-        # числовые поля модели
         numeric_fields = [
-            field.name
-            for field in model._meta.get_fields()
-            if (
-                    hasattr(field, 'get_internal_type')
-                    and field.get_internal_type() in [
-                        'IntegerField',
-                        'FloatField',
-                        'DecimalField',
-                        'PositiveIntegerField',
-                        'PositiveSmallIntegerField'
-                    ]
-                    and field.name not in ['id', 'created_at', 'updated_at']
-            )
+            field.name for field in model._meta.get_fields()
+            if hasattr(field, 'get_internal_type') and
+               field.get_internal_type() in [
+                   'IntegerField', 'FloatField', 'DecimalField',
+                   'PositiveIntegerField', 'PositiveSmallIntegerField'
+               ] and field.name not in ['id', 'created_at', 'updated_at']
         ]
 
         avg_values = {field: [] for field in numeric_fields}
@@ -125,7 +120,6 @@ class CalculateView(FormView):
                 if value is not None:
                     avg_values[field].append(value)
 
-            # Сохраняем нечисловые поля
             for field in vehicle._meta.fields:
                 field_name = field.name
                 if (field_name not in numeric_fields and
@@ -133,15 +127,12 @@ class CalculateView(FormView):
                         field_name not in other_fields):
                     other_fields[field_name] = getattr(vehicle, field_name)
 
-        # Вычисляем средние значения
         avg_fields = {}
         for field, values in avg_values.items():
             if values:
                 avg_fields[field] = sum(values) / len(values)
 
-        # нечисловые поля
         avg_fields.update(other_fields)
-
         avg_vehicle = model(**avg_fields)
         avg_vehicle.mark_name = "Средняя "
         vehicle_types = {
@@ -150,10 +141,129 @@ class CalculateView(FormView):
             'HEV': 'Гибрид',
             'PHEV': 'Заряжаемый гибрид'
         }
-        avg_vehicle.model_name = f"{vehicle_types[vehicle_type]} машина (основана на {len(vehicles)} моделях)"
-
-        avg_vehicle.id = -1  # специальный ID для усредненного ТС
+        avg_vehicle.model_name = f"{vehicle_types[vehicle_type]} (на основе {len(vehicles)} моделей)"
+        avg_vehicle.id = -1
 
         if model.__name__ in ['HEVVehicle'] and 'ice_share' not in avg_fields:
-            avg_vehicle.ice_share = 0.5  # Значение по умолчанию для гибридов
+            avg_vehicle.ice_share = 0.5
         return avg_vehicle
+
+    def create_plots(self, results):
+        """Генерация трех интерактивных графиков на основе результатов"""
+        if not results:
+            return None
+
+        # Подготовка данных
+        plot_data = []
+        for result in results:
+            vehicle = result['vehicle']
+            vehicle_name = f"{vehicle.mark_name} {vehicle.model_name}"
+            vehicle_type = vehicle.__class__.__name__.replace('Vehicle', '')
+
+            plot_data.append({
+                'Транспорт': vehicle_name[:40] + '...' if len(vehicle_name) > 40 else vehicle_name,
+                'Тип': vehicle_type,
+                'Расход': round(result['energy_kwh'] or result['fuel_liters'], 2),
+                'Единица': 'кВт·ч' if result['energy_kwh'] else 'л',
+                'Выбросы': round(result['emissions'], 2),
+                'Стоимость': round(result['tco'], 2)
+            })
+
+        df = pd.DataFrame(plot_data)
+
+        # Общий стиль для всех графиков
+        common_style = {
+            'layout': {
+                'plot_bgcolor': '#f8f9fa',
+                'paper_bgcolor': '#f8f9fa',
+                'font': {'family': 'Arial, sans-serif', 'size': 12},
+                'margin': {'t': 40, 'b': 100, 'l': 60, 'r': 40},
+                'xaxis': {'tickangle': -30},
+                'hoverlabel': {'font_size': 12}
+            },
+            'config': {'displayModeBar': False}
+        }
+
+        # 1. График расхода энергии/топлива
+        fig_consumption = px.bar(
+            df,
+            x='Транспорт',
+            y='Расход',
+            color='Тип',
+            color_discrete_map={
+                'ICE': '#3498db',
+                'EV': '#2ecc71',
+                'HEV': '#e74c3c',
+                'PHEV': '#9b59b6'
+            },
+            text=[f"{row['Расход']} {row['Единица']}" for _, row in df.iterrows()],
+            labels={'Расход': 'Значение', 'Транспорт': ''},
+            title='<b>Расход энергии/топлива</b>'
+        )
+        fig_consumption.update_traces(
+            textposition='outside',
+            marker_line_color='rgba(0,0,0,0.3)',
+            marker_line_width=1,
+            textfont_size=11
+        )
+        fig_consumption.update_layout(
+            yaxis_title='Расход (кВт·ч/л)',
+            **common_style['layout']
+        )
+
+        # 2. График выбросов CO₂
+        fig_emissions = px.bar(
+            df.sort_values('Выбросы'),
+            x='Транспорт',
+            y='Выбросы',
+            color='Тип',
+            color_discrete_map={
+                'ICE': '#3498db',
+                'EV': '#2ecc71',
+                'HEV': '#e74c3c',
+                'PHEV': '#9b59b6'
+            },
+            text='Выбросы',
+            labels={'Выбросы': 'Выбросы CO₂ (г)', 'Транспорт': ''},
+            title='<b>Выбросы CO₂</b>'
+        )
+        fig_emissions.update_traces(
+            texttemplate='%{y:.1f}',
+            textposition='outside'
+        )
+        fig_emissions.update_layout(
+            yaxis_title='Выбросы (г)',
+            **common_style['layout']
+        )
+
+        # 3. График стоимости владения
+        fig_cost = px.bar(
+            df.sort_values('Стоимость'),
+            x='Транспорт',
+            y='Стоимость',
+            color='Тип',
+            color_discrete_map={
+                'ICE': '#3498db',
+                'EV': '#2ecc71',
+                'HEV': '#e74c3c',
+                'PHEV': '#9b59b6'
+            },
+            text='Стоимость',
+            labels={'Стоимость': 'Стоимость (руб)', 'Транспорт': ''},
+            title='<b>Стоимость владения</b>'
+        )
+        fig_cost.update_traces(
+            texttemplate='%{y:,.0f}',
+            textposition='outside'
+        )
+        fig_cost.update_layout(
+            yaxis_title='Стоимость (руб)',
+            **common_style['layout']
+        )
+
+        # Конвертация в HTML
+        return {
+            'consumption': plot(fig_consumption, output_type='div', config=common_style['config']),
+            'emissions': plot(fig_emissions, output_type='div', config=common_style['config']),
+            'cost': plot(fig_cost, output_type='div', config=common_style['config'])
+        }
