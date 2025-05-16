@@ -73,6 +73,7 @@ class CalculateView(FormView):
 
         for vehicle in vehicles:
             distance = data['distance_km']
+            energy_source = data['energy_source']
             energy_result = EnergyCalculator.calculate_energy_consumption(
                 vehicle=vehicle,
                 distance_km=distance,
@@ -81,6 +82,8 @@ class CalculateView(FormView):
             emissions_result = EmissionsCalculator.calculate_co2(
                 vehicle=vehicle,
                 distance_km=distance,
+                energy_source=energy_source,
+                driving_conditions=(data['road_type'])
             )
             tco_result = TCOService.calculate_tco(
                 vehicle=vehicle,

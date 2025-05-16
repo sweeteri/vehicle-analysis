@@ -19,7 +19,7 @@ class EmissionsCalculator:
     PHEV_ELECTRIC_RANGE_FACTOR = 0.8  # Коэффициент использования электрического диапазона PHEV
 
     @classmethod
-    def calculate_co2(cls, vehicle, distance_km, energy_source='eu_avg',
+    def calculate_co2(cls, vehicle, distance_km, energy_source, driving_conditions,
                       use_recuperation=True, urban_share=0.5):
         """
         Расчет выбросов CO₂ за поездку
@@ -33,11 +33,11 @@ class EmissionsCalculator:
             )
         elif isinstance(vehicle, HEVVehicle):
             return cls._calculate_hev_co2(
-                vehicle, distance_km, energy_source,
+                vehicle, distance_km, driving_conditions,
             )
         elif isinstance(vehicle, PHEVVehicle):
             return cls._calculate_phev_co2(
-                vehicle, distance_km, energy_source,
+                vehicle, distance_km
             )
         else:
             raise ValueError(f"Unsupported vehicle type: {type(vehicle)}")
@@ -106,16 +106,9 @@ class EmissionsCalculator:
         return co2_emissions
 
     @classmethod
-    def _calculate_phev_co2(cls, vehicle, distance_km, energy_source):
+    def _calculate_phev_co2(cls, vehicle, distance_km):
         """
         Расчет выбросов CO2 для PHEV (все в км и литрах)
-        :param vehicle: объект PHEV с параметрами:
-            - battery_only_range_km: запас хода на электротяге (км)
-            - mpg_gas_only: расход в режиме ДВС (миль на галлон)
-            - kwh_100_km_battery_only: потребление энергии (кВтч/100км)
-        :param distance_km: общий пробег (км)
-        :param electricity_co2_per_kwh: выбросы электроэнергии (кг CO2/кВтч)
-        :return: суммарные выбросы CO2 (кг)
         """
         # пробег на электротяге и ДВС (в км)
         electricity_co2_per_kwh = 0.5
@@ -146,7 +139,6 @@ class EmissionsCalculator:
             {'id': 'nuclear', 'name': 'Атомные станции'},
             {'id': 'hydro', 'name': 'Гидроэнергетика'},
             {'id': 'eu_avg', 'name': 'Среднее по ЕС'},
-            {'id': 'russia_avg', 'name': 'Среднее по России'},
             {'id': 'renewables', 'name': 'ВИЭ (солнце/ветер)'}
         ]
 
