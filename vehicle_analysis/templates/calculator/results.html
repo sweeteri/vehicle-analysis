@@ -7,18 +7,26 @@
             {% if results %}
                 <!-- Графики -->
                 <div class="row mb-4 g-3">
-                    <div class="col-lg-12">
-                        <div class="chart-container p-3 bg-white rounded shadow-sm">
-                            {{ plots.consumption|safe }}
+                    <!-- Верхний ряд: Расход топлива и энергии -->
+                    <div class="col-lg-6">
+                        <div class="chart-container p-3 bg-white rounded shadow-sm h-100">
+                            {{ plots.consumption_fuel|safe }}
                         </div>
                     </div>
                     <div class="col-lg-6">
-                        <div class="chart-container p-3 bg-white rounded shadow-sm">
+                        <div class="chart-container p-3 bg-white rounded shadow-sm h-100">
+                            {{ plots.consumption_energy|safe }}
+                        </div>
+                    </div>
+
+                    <!-- Нижний ряд: Выбросы и стоимость -->
+                    <div class="col-lg-6">
+                        <div class="chart-container p-3 bg-white rounded shadow-sm h-100">
                             {{ plots.emissions|safe }}
                         </div>
                     </div>
                     <div class="col-lg-6">
-                        <div class="chart-container p-3 bg-white rounded shadow-sm">
+                        <div class="chart-container p-3 bg-white rounded shadow-sm h-100">
                             {{ plots.cost|safe }}
                         </div>
                     </div>
@@ -42,6 +50,9 @@
                         <tbody>
                         {% for item in results %}
                             <tr data-consumption="
+                                    
+                                    
+                                    
                                     {% if item.energy_kwh %}{{ item.energy_kwh }}{% else %}{{ item.fuel_liters }}{% endif %}"
                                 data-emissions="{{ item.emissions }}"
                                 data-tco="{{ item.tco }}">
