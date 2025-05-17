@@ -1,0 +1,156 @@
+{% if show_results %}
+<div class="mt-5 card shadow-sm">
+    <div class="card-header bg-success text-white">
+        <h4 class="my-0 fw-normal"><i class="fas fa-chart-bar me-2"></i>Результаты симуляции</h4>
+    </div>
+    <div class="card-body">
+        {% if results %}
+            <!-- Информация о периоде -->
+            <div class="alert alert-info mb-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        <i class="fas fa-calendar-alt me-2"></i>
+                        <strong>Период:</strong> {{ form.start_date.value }} - {{ form.end_date.value }}
+                    </div>
+                    <div class="col-md-4">
+                        <i class="fas fa-clock me-2"></i>
+                        <strong>Часов в день:</strong> {{ form.daily_hours.value }}
+                    </div>
+                    <div class="col-md-4">
+                        <i class="fas fa-plug me-2"></i>
+                        <strong>Энергия:</strong> {{ form.energy_source.value }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Графики -->
+            <div class="row mb-4 g-3">
+                <div class="col-lg-12">
+                    <div class="chart-container p-3 bg-white rounded shadow-sm">
+                        {{ plots.energy|safe }}
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="chart-container p-3 bg-white rounded shadow-sm">
+                        {{ plots.emissions|safe }}
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="chart-container p-3 bg-white rounded shadow-sm">
+                        {{ plots.cost|safe }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Таблица результатов -->
+            <div class="table-responsive mt-4">
+                <table class="table table-hover" id="resultsTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Транспортное средство</th>
+                            <th class="sortable" data-sort="consumption">
+                                Расход <span class="sort-arrow">↕</span>
+                            </th>
+                            <th class="sortable" data-sort="emissions">
+                                Выбросы CO₂ <span class="sort-arrow">↕</span>
+                            </th>
+                            <th class="sortable" data-sort="cost">
+                                Стоимость <span class="sort-arrow">↕</span>
+                            </th>
+                            <th>Детали</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in results %}
+                        <tr data-consumption="{% if item.energy_kwh %}{{ item.energy_kwh }}{% else %}{{ item.fuel_liters }}{% endif %}"
+                            data-emissions="{{ item.emissions }}"
+                            data-cost="{{ item.tco }}">
+                            <td>
+                                <strong>{{ item.vehicle.mark_name }} {{ item.vehicle.model_name }}</strong><br>
+                                <small class="text-muted">{{ item.vehicle.get_engine_type_display }}</small>
+                            </td>
+                            <td>
+                                {% if item.energy_kwh %}
+                                    {{ item.energy_kwh|floatformat:2 }} <small>кВт·ч</small>
+                                {% else %}
+                                    {{ item.fuel_liters|floatformat:2 }} <small>л</small>
+                                {% endif %}
+                            </td>
+                            <td>{{ item.emissions|floatformat:2 }} <small>г CO₂</small></td>
+                            <td>{{ item.tco|floatformat:2 }} <small>руб</small></td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-primary details-btn"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#details-{{ forloop.counter }}">
+                                    <i class="fas fa-chevron-down"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr class="collapse" id="details-{{ forloop.counter }}">
+                            <td colspan="5">
+                                <div class="p-3 bg-light rounded">
+                                    <h6>Дневные показатели:</h6>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <strong>Энергия:</strong><br>
+                                            {% if item.daily_data.energy.energy_kwh %}
+                                                {{ item.daily_data.energy.energy_kwh|floatformat:2 }} кВт·ч
+                                            {% else %}
+                                                {{ item.daily_data.energy.fuel_liters|floatformat:2 }} л
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-md-4">
+                                            <strong>Выбросы:</strong><br>
+                                            {{ item.daily_data.emissions|floatformat:2 }} г CO₂
+                                        </div>
+                                        <div class="col-md-4">
+                                            <strong>Стоимость:</strong><br>
+                                            {{ item.daily_data.cost.total|floatformat:2 }} руб
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="alert alert-warning">Нет данных для отображения</div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    .chart-container {
+        height: 400px;
+        margin-bottom: 15px;
+        border: 1px solid #dee2e6;
+        border-radius: 5px;
+    }
+
+    .details-btn {
+        transition: transform 0.3s;
+    }
+
+    .details-btn[aria-expanded="true"] {
+        transform: rotate(180deg);
+    }
+
+    .sortable {
+        cursor: pointer;
+    }
+
+    .sortable:hover {
+        background-color: rgba(0,0,0,0.05);
+    }
+
+    @media (max-width: 768px) {
+        .chart-container {
+            height: 300px;
+        }
+    }
+</style>
+
+<script src="{% static 'vehicle_simulation/js/table_sort.js' %}"></script>
+{% endif %}

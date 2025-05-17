@@ -1,0 +1,22 @@
+{% extends "includes/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Форма всегда видна -->
+    {% include "vehicle_simulation/form.html" %}
+    
+    <!-- Отладочная информация -->
+    <div class="alert alert-info">
+        <p>Отладка: show_results = {{ show_results|yesno:"Да,Нет" }}</p>
+        <p>Количество результатов: {{ results|length }}</p>
+    </div>
+    
+    <!-- Блок результатов -->
+    {% if show_results and results %}
+        {% include "vehicle_simulation/results.html" %}
+    {% elif show_results %}
+        <div class="alert alert-warning">Нет данных для отображения</div>
+    {% endif %}
+</div>
+{% endblock %}

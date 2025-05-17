@@ -1,0 +1,40 @@
+/* Стили для формы симуляции */
+.analysis-section {
+    padding: 15px;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.card-header {
+    font-weight: 500;
+}
+
+/* Стили для таблицы результатов */
+#resultsTable {
+    width: 100%;
+    margin-bottom: 1rem;
+    color: #212529;
+}
+
+#resultsTable th {
+    vertical-align: bottom;
+    border-bottom: 2px solid #dee2e6;
+    cursor: pointer;
+}
+
+#resultsTable th.sortable:hover {
+    background-color: #f8f9fa;
+}
+
+.sort-arrow {
+    font-size: 0.8em;
+    color: #6c757d;
+}
+
+/* Стили для графиков */
+.chart-container {
+    position: relative;
+    height: 300px;
+    width: 100%;
+}

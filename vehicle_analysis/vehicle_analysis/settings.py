@@ -22,7 +22,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'vehicles',
     'calculator',
-    'import_export'
+    'import_export',
+    'vehicle_simulation'
 ]
 
 MIDDLEWARE = [
