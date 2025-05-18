@@ -1,21 +1,21 @@
-from calculator.engines.emissions import EmissionsCalculator
+from datetime import timedelta
 from vehicles.models import ICEVehicle, EVVehicle, HEVVehicle, PHEVVehicle
+from calculator.engines.emissions import EmissionsCalculator
 
-
-class TimeBasedEmissionsCalculator:
-    @staticmethod
-    def calculate_daily_emissions(vehicle, daily_distance_km, energy_source='eu_avg', driving_conditions='mixed'):
-        """Расчет дневных выбросов"""
-        return EmissionsCalculator.calculate_co2(
-            vehicle, daily_distance_km, energy_source, driving_conditions
+def simulate_daily_emissions(vehicle, start_date, end_date, daily_km,
+                             energy_source='eu_avg', driving_conditions='mixed',
+                             use_recuperation=True, urban_share=0.5):
+    results = []
+    current = start_date
+    while current <= end_date:
+        co2 = EmissionsCalculator.calculate_co2(
+            vehicle,
+            distance_km=daily_km,
+            energy_source=energy_source,
+            driving_conditions=driving_conditions,
+            use_recuperation=use_recuperation,
+            urban_share=urban_share
         )
-
-    @staticmethod
-    def calculate_emissions_for_period(vehicle, daily_distance_km, days, energy_source='eu_avg',
-                                       driving_conditions='mixed'):
-        """Расчет выбросов за период (в днях)"""
-        daily_emissions = EmissionsCalculator.calculate_co2(
-            vehicle, daily_distance_km, energy_source, driving_conditions
-        )
-
-        return {day: daily_emissions * day for day in range(1, days + 1)}
+        results.append({'date': current, 'co2_g': co2})
+        current += timedelta(days=1)
+    return results

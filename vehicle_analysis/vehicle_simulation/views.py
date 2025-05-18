@@ -2,11 +2,10 @@ from django.apps import apps
 from django.views.generic import FormView
 from django.urls import reverse_lazy
 from django.shortcuts import render
-from datetime import datetime, timedelta
-import plotly.graph_objects as go
-from plotly.offline import plot
+from datetime import datetime
+from math import ceil
 from .forms import VehicleSelectForm
-from .engines.simulator import VehicleSimulator
+from .engines.simulator import run_simulation
 
 
 class SimulationView(FormView):
@@ -15,72 +14,82 @@ class SimulationView(FormView):
     success_url = reverse_lazy('vehicle_simulation:simulate')
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+        ctx = super().get_context_data(**kwargs)
         if not self.request.POST:
-            context['form'] = self.form_class(initial={
+            ctx['form'] = self.form_class(initial={
                 'start_date': datetime.now().date(),
-                'end_date': datetime.now().date() + timedelta(days=30),
+                'end_date':   (datetime.now().date()),
                 'daily_distance': 50,
-                'daily_hours': 8,
+                'daily_hours':    8,
                 'energy_source': 'eu_avg',
                 'driving_conditions': 'mixed',
                 'compare_types': ['ICE', 'HEV', 'PHEV', 'EV']
             })
-        return context
+        return ctx
 
     def form_valid(self, form):
-        print("Форма валидна. Данные:", form.cleaned_data)
-        try:
-            data = form.cleaned_data
+        data = form.cleaned_data
+        # поправляем compare_types из POST
+        data['compare_types'] = self.request.POST.getlist('compare_types')
 
-            if self.request.method == 'POST':
-                data['compare_types'] = self.request.POST.getlist('compare_types')
-
-            vehicles = self._get_vehicles_for_analysis(data)
-            if not vehicles:
-                form.add_error(None, "Не выбрано ни одного транспортного средства")
-                return self.form_invalid(form)
-
-            results = []
-            for vehicle in vehicles:
-                simulator = VehicleSimulator(
-                    vehicle=vehicle,
-                    daily_distance_km=data['daily_distance'],
-                    daily_usage_hours=data['daily_hours'],
-                    start_date=data['start_date'],
-                    end_date=data['end_date'],
-                    energy_source=data['energy_source'],
-                    driving_conditions=data['driving_conditions']
-                )
-                simulation_result = simulator.simulate()
-                results.append({
-                    'vehicle': vehicle,
-                    'simulation': simulation_result,
-                    'daily_data': simulation_result.get_daily_data(),
-                    'period_data': simulation_result.get_cumulative_data(),
-                    'summary': simulation_result.get_summary_stats()
-                })
-
-            context = {
-                'form': form,
-                'show_results': True,
-                'results': results,
-                'plots': self._generate_plots(results),
-                'simulation_params': {
-                    'start_date': data['start_date'],
-                    'end_date': data['end_date'],
-                    'daily_distance': data['daily_distance'],
-                    'daily_hours': data['daily_hours'],
-                    'energy_source': dict(form.fields['energy_source'].choices)[data['energy_source']],
-                    'driving_conditions': dict(form.fields['driving_conditions'].choices)[data['driving_conditions']]
-                }
-            }
-            return render(self.request, self.template_name, context)
-
-        except Exception as e:
-            print(f"Ошибка при обработке формы: {str(e)}")
-            form.add_error(None, f"Ошибка при расчетах: {str(e)}")
+        vehicles = self._get_vehicles_for_analysis(data)
+        if not vehicles:
+            form.add_error(None, "Нужно выбрать хотя бы одно ТС или тип")
             return self.form_invalid(form)
+
+        # параметры симуляции
+        start_date = data['start_date']
+        end_date   = data['end_date']
+        # считаем, сколько полных дней +1 (включительно)
+        total_days = (end_date - start_date).days + 1
+        # переводим дни в «месяцы» по 30 дн.
+        months = total_days / 30.0
+
+        daily_km   = data['daily_distance']
+        cond       = data.get('driving_conditions', 'mixed')
+        source     = data['energy_source']
+        use_recup  = data.get('use_recuperation', True)
+        urban_share= data.get('urban_share', 0.5)
+
+        results = []
+        for v in vehicles:
+            sim = run_simulation(
+                vehicle = v,
+                start_date = start_date,
+                end_date = end_date,
+                daily_km = daily_km,
+                driving_conditions = cond,
+                energy_source = source,
+                use_recuperation = use_recup,
+                urban_share = urban_share
+                )
+
+            # считаем суммарные показатели
+            total_energy = sum(
+                day['energy'].get('energy_mj',
+                                  day['energy'].get('energy_kwh', 0) * 3.6)
+                for day in sim
+            )
+            total_co2  = sum(day['co2_g'] for day in sim)
+            total_cost = sum(day['cost_rub'] for day in sim)
+
+            results.append({
+                'vehicle': v,
+                'daily':   sim,
+                'summary': {
+                    'energy_mj': total_energy,
+                    'co2_g':     total_co2,
+                    'cost_rub':  total_cost
+                }
+            })
+
+        context = {
+            'form':         form,
+            'show_results': True,
+            'results':      results,
+            'plots':        self._generate_plots(results),
+        }
+        return render(self.request, self.template_name, context)
 
     def _get_vehicles_for_analysis(self, data):
         vehicles = []
@@ -97,85 +106,86 @@ class SimulationView(FormView):
             }
             for v_type in data.get('compare_types', []):
                 if model := vehicle_map.get(v_type):
-                    if avg_vehicle := self._create_average_vehicle(model, v_type):
-                        vehicles.append(avg_vehicle)
+                    if avg := self._create_average_vehicle(model, v_type):
+                        vehicles.append(avg)
         return vehicles
 
     def _create_average_vehicle(self, model, vehicle_type):
-        vehicles = model.objects.all()
-        if not vehicles.exists():
+        qs = model.objects.all()
+        if not qs.exists():
             return None
-
         numeric_fields = [
             f.name for f in model._meta.get_fields()
             if hasattr(f, 'get_internal_type') and
                f.get_internal_type() in [
                    'IntegerField', 'FloatField', 'DecimalField',
                    'PositiveIntegerField', 'PositiveSmallIntegerField'
-               ] and f.name not in ['id', 'created_at', 'updated_at']
+               ] and f.name != 'id'
         ]
-
-        avg_vehicle = model()
+        avg = model()
         for field in numeric_fields:
-            values = [getattr(v, field) for v in vehicles if getattr(v, field) is not None]
-            if values:
-                setattr(avg_vehicle, field, sum(values) / len(values))
-
-        avg_vehicle.mark_name = "Средний"
-        avg_vehicle.model_name = {
-            'ICE': 'ДВС',
-            'HEV': 'Гибрид',
-            'PHEV': 'PHEV',
-            'EV': 'Электро'
-        }.get(vehicle_type, '')
-        avg_vehicle.id = -1
-
-        return avg_vehicle
+            vals = [getattr(v, field) for v in qs if getattr(v, field) is not None]
+            if vals:
+                setattr(avg, field, sum(vals) / len(vals))
+        avg.mark_name = "Средний"
+        avg.model_name = {
+            'ICE': 'ДВС', 'HEV': 'Гибрид',
+            'PHEV': 'PHEV', 'EV': 'Электро'
+        }[vehicle_type]
+        avg.id = -1
+        return avg
 
     def _generate_plots(self, results):
-        if not results:
-            return None
+        import plotly.graph_objects as go
+        from plotly.offline import plot
 
-        figures = {
-            'energy': go.Figure(),
-            'emissions': go.Figure(),
-            'cost': go.Figure()
+        # все графики одного размера
+        default_height = 350
+        figs = {
+            'energy':    go.Figure(layout={'height': default_height}),
+            'emissions': go.Figure(layout={'height': default_height}),
+            'cost':      go.Figure(layout={'height': default_height})
         }
         colors = ['#3498db', '#2ecc71', '#e74c3c', '#9b59b6']
 
-        for i, result in enumerate(results):
-            vehicle = result['vehicle']
-            period_data = result['period_data']
-            name = f"{vehicle.mark_name} {vehicle.model_name}"
+        for idx, item in enumerate(results):
+            v    = item['vehicle']
+            name = f"{v.mark_name} {v.model_name}"
+            dates = [d['date'] for d in item['daily']]
+            energy = [d['energy'].get('useful_energy_mj',
+                                      d['energy'].get('energy_mj', 0))
+                      for d in item['daily']]
+            co2    = [d['co2_g'] for d in item['daily']]
+            cost   = [d['cost_rub'] for d in item['daily']]
 
-            for metric, fig in figures.items():
-                fig.add_trace(go.Scatter(
-                    x=period_data['dates'],
-                    y=[period_data[metric][day] for day in period_data[metric]],
-                    name=name,
-                    line=dict(color=colors[i % len(colors)], width=2),
-                    mode='lines+markers'
-                ))
+            figs['energy'].add_trace(go.Scatter(
+                x=dates, y=energy, name=name,
+                line=dict(color=colors[idx % len(colors)], width=2)
+            ))
+            figs['emissions'].add_trace(go.Scatter(
+                x=dates, y=co2, name=name,
+                line=dict(color=colors[idx % len(colors)], width=2)
+            ))
+            figs['cost'].add_trace(go.Scatter(
+                x=dates, y=cost, name=name,
+                line=dict(color=colors[idx % len(colors)], width=2)
+            ))
 
-        for metric, fig in figures.items():
+        for key, fig in figs.items():
             fig.update_layout(
                 plot_bgcolor='rgba(0,0,0,0)',
                 paper_bgcolor='rgba(0,0,0,0)',
                 xaxis_title='Дата',
                 yaxis_title={
-                    'cost': 'Стоимость (руб)',
+                    'energy': 'Полезная энергия (МДж)',
                     'emissions': 'Выбросы CO₂ (г)',
-                    'energy': 'Энергия (МДж)'
-                }[metric],
-                margin=dict(l=50, r=50, b=50, t=50),
-                legend=dict(
-                    orientation="h",
-                    yanchor="bottom",
-                    y=1.02,
-                    xanchor="right",
-                    x=1
-                )
+                    'cost': 'Стоимость в день (руб)'
+                }[key],
+                margin=dict(l=40, r=20, t=30, b=40),
+                legend=dict(orientation='h', y=1.1, x=0),
             )
 
-        return {k: plot(v, output_type='div', config={'displayModeBar': False})
-                for k, v in figures.items()}
+        return {
+            k: plot(v, output_type='div', config={'displayModeBar': False})
+            for k, v in figs.items()
+        }

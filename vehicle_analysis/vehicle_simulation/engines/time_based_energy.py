@@ -1,30 +1,22 @@
-from calculator.engines.energy import EnergyCalculator
+from datetime import timedelta
 from vehicles.models import ICEVehicle, EVVehicle, HEVVehicle, PHEVVehicle
+from calculator.engines.energy import EnergyCalculator
 
-
-class TimeBasedEnergyCalculator:
-    @staticmethod
-    def calculate_daily_energy(vehicle, daily_distance_km, driving_conditions='mixed'):
-        """Расчет дневного потребления энергии"""
-        return EnergyCalculator.calculate_energy_consumption(
-            vehicle, daily_distance_km, driving_conditions
+def simulate_daily_energy(vehicle, start_date, end_date, daily_km, driving_conditions='mixed'):
+    """
+    Возвращает список:
+      [{'date': date, 'energy_mj':…, …}, …]
+    для каждого дня от start_date до end_date (включительно).
+    """
+    results = []
+    current = start_date
+    while current <= end_date:
+        res = EnergyCalculator.calculate_energy_consumption(
+            vehicle,
+            distance_km=daily_km,
+            driving_conditions=driving_conditions
         )
-
-    @staticmethod
-    def calculate_energy_for_period(vehicle, daily_distance_km, days, driving_conditions='mixed'):
-        """Расчет потребления энергии за период (в днях)"""
-        daily_data = EnergyCalculator.calculate_energy_consumption(
-            vehicle, daily_distance_km, driving_conditions
-        )
-
-        result = {}
-        for day in range(1, days + 1):
-            day_data = {}
-            for key, value in daily_data.items():
-                if isinstance(value, (int, float)):
-                    day_data[key] = value * day
-                else:
-                    day_data[key] = value
-            result[day] = day_data
-
-        return result
+        res['date'] = current
+        results.append(res)
+        current += timedelta(days=1)
+    return results

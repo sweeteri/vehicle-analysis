@@ -1,178 +1,66 @@
-{% extends "includes/base.html" %}
 {% load static %}
-{% load vehicle_tags %}
 
-{% block content %}
 {% if show_results %}
-<div class="mt-5 card shadow-sm">
+<div class="container mt-5">
+  <!-- Графики -->
+  <div class="row mb-4 g-3">
+    <div class="col-12">
+      <div class="chart-container p-3 bg-white rounded shadow-sm">
+        {{ plots.energy|safe }}
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="chart-container p-3 bg-white rounded shadow-sm">
+        {{ plots.emissions|safe }}
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="chart-container p-3 bg-white rounded shadow-sm">
+        {{ plots.cost|safe }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Таблица суммарных показателей -->
+  <div class="card shadow-sm">
     <div class="card-header bg-success text-white">
-        <h4 class="my-0 fw-normal"><i class="fas fa-chart-bar me-2"></i>Результаты симуляции</h4>
+      <h5 class="mb-0"><i class="fas fa-list me-2"></i>Суммарные результаты за период</h5>
     </div>
     <div class="card-body">
-        {% if results %}
-            <!-- Информация о параметрах симуляции -->
-            <div class="alert alert-info mb-4">
-                <div class="row">
-                    <div class="col-md-4">
-                        <i class="fas fa-calendar-alt me-2"></i>
-                        <strong>Период:</strong> {{ simulation_params.start_date }} - {{ simulation_params.end_date }}
-                    </div>
-                    <div class="col-md-4">
-                        <i class="fas fa-road me-2"></i>
-                        <strong>Дневной пробег:</strong> {{ simulation_params.daily_distance }} км
-                    </div>
-                    <div class="col-md-4">
-                        <i class="fas fa-clock me-2"></i>
-                        <strong>Часов в день:</strong> {{ simulation_params.daily_hours }}
-                    </div>
-                    <div class="col-md-4">
-                        <i class="fas fa-plug me-2"></i>
-                        <strong>Энергия:</strong> {{ simulation_params.energy_source }}
-                    </div>
-                    <div class="col-md-4">
-                        <i class="fas fa-car me-2"></i>
-                        <strong>Условия:</strong> {{ simulation_params.driving_conditions }}
-                    </div>
-                </div>
-            </div>
-
-            <!-- Графики -->
-            <div class="row mb-4 g-3">
-                <div class="col-lg-12">
-                    <div class="chart-container p-3 bg-white rounded shadow-sm">
-                        {{ plots.energy|safe }}
-                    </div>
-                </div>
-                <div class="col-lg-6">
-                    <div class="chart-container p-3 bg-white rounded shadow-sm">
-                        {{ plots.emissions|safe }}
-                    </div>
-                </div>
-                <div class="col-lg-6">
-                    <div class="chart-container p-3 bg-white rounded shadow-sm">
-                        {{ plots.cost|safe }}
-                    </div>
-                </div>
-            </div>
-
-            <!-- Таблица результатов -->
-            <div class="table-responsive mt-4">
-                <table class="table table-hover" id="resultsTable">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Транспортное средство</th>
-                            <th class="sortable" data-sort="energy">
-                                Энергия <span class="sort-arrow">↕</span>
-                            </th>
-                            <th class="sortable" data-sort="emissions">
-                                Выбросы CO₂ <span class="sort-arrow">↕</span>
-                            </th>
-                            <th class="sortable" data-sort="cost">
-                                Стоимость <span class="sort-arrow">↕</span>
-                            </th>
-                            <th>Детали</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for item in results %}
-                        <tr data-energy="{{ item.daily_data.energy.total_energy_mj|default:0 }}"
-                            data-emissions="{{ item.daily_data.emissions }}"
-                            data-cost="{{ item.daily_data.cost }}">
-                            <td>
-                                <strong>{{ item.vehicle.mark_name }} {{ item.vehicle.model_name }}</strong><br>
-                                <small class="text-muted">
-                                    {% if item.vehicle|isinstance:"ICEVehicle" %}ДВС
-                                    {% elif item.vehicle|isinstance:"EVVehicle" %}Электро
-                                    {% elif item.vehicle|isinstance:"HEVVehicle" %}Гибрид
-                                    {% elif item.vehicle|isinstance:"PHEVVehicle" %}PHEV
-                                    {% endif %}
-                                </small>
-                            </td>
-                            <td>
-                                {% if item.daily_data.energy.energy_kwh %}
-                                    {{ item.daily_data.energy.energy_kwh|floatformat:2 }} <small>кВт·ч</small>
-                                {% else %}
-                                    {{ item.daily_data.energy.fuel_liters|floatformat:2 }} <small>л</small>
-                                {% endif %}
-                            </td>
-                            <td>{{ item.daily_data.emissions|floatformat:2 }} <small>г CO₂</small></td>
-                            <td>{{ item.daily_data.cost|floatformat:2 }} <small>руб</small></td>
-                            <td>
-                                <button class="btn btn-sm btn-outline-primary details-btn"
-                                        data-bs-toggle="collapse"
-                                        data-bs-target="#details-{{ forloop.counter }}">
-                                    <i class="fas fa-chevron-down"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr class="collapse" id="details-{{ forloop.counter }}">
-                            <td colspan="5">
-                                <div class="p-3 bg-light rounded">
-                                    <h6>Дневные показатели:</h6>
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <strong>Энергия:</strong><br>
-                                            {% if item.daily_data.energy.energy_kwh %}
-                                                {{ item.daily_data.energy.energy_kwh|floatformat:2 }} кВт·ч
-                                                ({{ item.daily_data.energy.total_energy_mj|floatformat:2 }} МДж)
-                                            {% else %}
-                                                {{ item.daily_data.energy.fuel_liters|floatformat:2 }} л
-                                                ({{ item.daily_data.energy.total_energy_mj|floatformat:2 }} МДж)
-                                            {% endif %}
-                                        </div>
-                                        <div class="col-md-4">
-                                            <strong>Выбросы:</strong><br>
-                                            {{ item.daily_data.emissions|floatformat:2 }} г CO₂
-                                        </div>
-                                        <div class="col-md-4">
-                                            <strong>Стоимость:</strong><br>
-                                            {{ item.daily_data.cost|floatformat:2 }} руб
-                                        </div>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        {% else %}
-            <div class="alert alert-warning">Нет данных для отображения</div>
-        {% endif %}
+      <table class="table table-bordered table-hover">
+        <thead class="table-light">
+          <tr>
+            <th>Транспортное средство</th>
+            <th>Энергия (МДж)</th>
+            <th>Выбросы CO₂ (г)</th>
+            <th>Стоимость (руб)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in results %}
+          <tr>
+            <td>
+              <strong>{{ item.vehicle.mark_name }} {{ item.vehicle.model_name }}</strong>
+            </td>
+            <td>{{ item.summary.energy_mj|floatformat:1 }}</td>
+            <td>{{ item.summary.co2_g|floatformat:1 }}</td>
+            <td>{{ item.summary.cost_rub|floatformat:1 }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
+  </div>
 </div>
 
 <style>
-    .chart-container {
-        height: 400px;
-        margin-bottom: 15px;
-        border: 1px solid #dee2e6;
-        border-radius: 5px;
-    }
-
-    .details-btn {
-        transition: transform 0.3s;
-    }
-
-    .details-btn[aria-expanded="true"] {
-        transform: rotate(180deg);
-    }
-
-    .sortable {
-        cursor: pointer;
-    }
-
-    .sortable:hover {
-        background-color: rgba(0,0,0,0.05);
-    }
-
-    @media (max-width: 768px) {
-        .chart-container {
-            height: 300px;
-        }
-    }
+  .chart-container {
+      height: 350px;
+      border: 1px solid #dee2e6;
+      border-radius: 5px;
+  }
+  @media (max-width: 768px) {
+      .chart-container { height: 250px; }
+  }
 </style>
-
-<script src="{% static 'vehicle_simulation/js/table_sort.js' %}"></script>
 {% endif %}
-{% endblock %}
