@@ -18,7 +18,8 @@
     </div>
     {% endif %}
 
-    <form method="post" action="{% url 'vehicle_simulation:simulate' %}" class="needs-validation" novalidate id="simulation-form">
+    <form method="post" action="{% url 'vehicle_simulation:simulate' %}"
+          class="needs-validation" novalidate id="simulation-form">
         {% csrf_token %}
 
         <!-- Блок выбора типа анализа -->
@@ -204,6 +205,14 @@
         </div>
     </form>
 </div>
+
+<style>
+    /* Снимаем двойную границу между соседними карточками */
+    .card + .card {
+        border-top: none;
+        margin-top: -1px;
+    }
+</style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {

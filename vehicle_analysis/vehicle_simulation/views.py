@@ -139,12 +139,12 @@ class SimulationView(FormView):
         import plotly.graph_objects as go
         from plotly.offline import plot
 
-        # все графики одного размера
         default_height = 350
         figs = {
-            'energy':    go.Figure(layout={'height': default_height}),
-            'emissions': go.Figure(layout={'height': default_height}),
-            'cost':      go.Figure(layout={'height': default_height})
+            'fuel':     go.Figure(layout={'height': default_height}),
+            'electric': go.Figure(layout={'height': default_height}),
+            'emissions':go.Figure(layout={'height': default_height}),
+            'cost':     go.Figure(layout={'height': default_height}),
         }
         colors = ['#3498db', '#2ecc71', '#e74c3c', '#9b59b6']
 
@@ -152,40 +152,70 @@ class SimulationView(FormView):
             v    = item['vehicle']
             name = f"{v.mark_name} {v.model_name}"
             dates = [d['date'] for d in item['daily']]
-            energy = [d['energy'].get('useful_energy_mj',
-                                      d['energy'].get('energy_mj', 0))
-                      for d in item['daily']]
-            co2    = [d['co2_g'] for d in item['daily']]
-            cost   = [d['cost_rub'] for d in item['daily']]
 
-            figs['energy'].add_trace(go.Scatter(
-                x=dates, y=energy, name=name,
+            # расход топлива (л/день)
+            fuel_vals = [d['energy'].get('fuel_liters', 0) for d in item['daily']]
+            figs['fuel'].add_trace(go.Scatter(
+                x=dates, y=fuel_vals, name=name,
                 line=dict(color=colors[idx % len(colors)], width=2)
             ))
+
+            # расход электроэнергии (кВт·ч/день)
+            elec_vals = [d['energy'].get('energy_kwh', 0) for d in item['daily']]
+            figs['electric'].add_trace(go.Scatter(
+                x=dates, y=elec_vals, name=name,
+                line=dict(color=colors[idx % len(colors)], width=2)
+            ))
+
+            # выбросы CO₂ (г/день)
+            co2 = [d['co2_g'] for d in item['daily']]
             figs['emissions'].add_trace(go.Scatter(
                 x=dates, y=co2, name=name,
                 line=dict(color=colors[idx % len(colors)], width=2)
             ))
+
+            # стоимость (руб/день)
+            cost_vals = [d['cost_rub'] for d in item['daily']]
             figs['cost'].add_trace(go.Scatter(
-                x=dates, y=cost, name=name,
+                x=dates, y=cost_vals, name=name,
                 line=dict(color=colors[idx % len(colors)], width=2)
             ))
 
-        for key, fig in figs.items():
-            fig.update_layout(
-                plot_bgcolor='rgba(0,0,0,0)',
-                paper_bgcolor='rgba(0,0,0,0)',
-                xaxis_title='Дата',
-                yaxis_title={
-                    'energy': 'Полезная энергия (МДж)',
-                    'emissions': 'Выбросы CO₂ (г)',
-                    'cost': 'Стоимость в день (руб)'
-                }[key],
-                margin=dict(l=40, r=20, t=30, b=40),
-                legend=dict(orientation='h', y=1.1, x=0),
-            )
+        # Настройки графиков
+        figs['fuel'].update_layout(
+            plot_bgcolor='rgba(0,0,0,0)',
+            paper_bgcolor='rgba(0,0,0,0)',
+            xaxis_title='Дата',
+            yaxis_title='Расход топлива (л/день)',
+            margin=dict(l=40, r=20, t=30, b=40),
+            legend=dict(orientation='h', y=1.1, x=0),
+        )
+        figs['electric'].update_layout(
+            plot_bgcolor='rgba(0,0,0,0)',
+            paper_bgcolor='rgba(0,0,0,0)',
+            xaxis_title='Дата',
+            yaxis_title='Расход электроэнергии (кВт·ч/день)',
+            margin=dict(l=40, r=20, t=30, b=40),
+            legend=dict(orientation='h', y=1.1, x=0),
+        )
+        figs['emissions'].update_layout(
+            plot_bgcolor='rgba(0,0,0,0)',
+            paper_bgcolor='rgba(0,0,0,0)',
+            xaxis_title='Дата',
+            yaxis_title='Выбросы CO₂ (г/день)',
+            margin=dict(l=40, r=20, t=30, b=40),
+            legend=dict(orientation='h', y=1.1, x=0),
+        )
+        figs['cost'].update_layout(
+            plot_bgcolor='rgba(0,0,0,0)',
+            paper_bgcolor='rgba(0,0,0,0)',
+            xaxis_title='Дата',
+            yaxis_title='Стоимость в день (руб)',
+            margin=dict(l=40, r=20, t=30, b=40),
+            legend=dict(orientation='h', y=1.1, x=0),
+        )
 
         return {
-            k: plot(v, output_type='div', config={'displayModeBar': False})
-            for k, v in figs.items()
+            key: plot(fig, output_type='div', config={'displayModeBar': False})
+            for key, fig in figs.items()
         }

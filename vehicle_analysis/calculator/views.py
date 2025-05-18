@@ -73,6 +73,7 @@ class CalculateView(FormView):
 
         for vehicle in vehicles:
             distance = data['distance_km']
+            energy_source = data['energy_source']
             energy_result = EnergyCalculator.calculate_energy_consumption(
                 vehicle=vehicle,
                 distance_km=distance,
@@ -81,6 +82,8 @@ class CalculateView(FormView):
             emissions_result = EmissionsCalculator.calculate_co2(
                 vehicle=vehicle,
                 distance_km=distance,
+                energy_source=energy_source,
+                driving_conditions=(data['road_type'])
             )
             tco_result = TCOService.calculate_tco(
                 vehicle=vehicle,
@@ -104,11 +107,14 @@ class CalculateView(FormView):
 
         numeric_fields = [
             field.name for field in model._meta.get_fields()
-            if hasattr(field, 'get_internal_type') and
-               field.get_internal_type() in [
-                   'IntegerField', 'FloatField', 'DecimalField',
-                   'PositiveIntegerField', 'PositiveSmallIntegerField'
-               ] and field.name not in ['id', 'created_at', 'updated_at']
+            if (
+                    hasattr(field, 'get_internal_type')
+                    and field.get_internal_type() in [
+                        'IntegerField', 'FloatField', 'DecimalField',
+                        'PositiveIntegerField', 'PositiveSmallIntegerField'
+                    ]
+                    and field.name not in ['id', 'created_at', 'updated_at']
+            )
         ]
 
         avg_values = {field: [] for field in numeric_fields}
@@ -149,121 +155,101 @@ class CalculateView(FormView):
         return avg_vehicle
 
     def create_plots(self, results):
-        """Генерация трех интерактивных графиков на основе результатов"""
         if not results:
             return None
 
-        # Подготовка данных
         plot_data = []
         for result in results:
             vehicle = result['vehicle']
-            vehicle_name = f"{vehicle.mark_name} {vehicle.model_name}"
+            name = f"{vehicle.mark_name} {vehicle.model_name}"[:40]
             vehicle_type = vehicle.__class__.__name__.replace('Vehicle', '')
 
-            plot_data.append({
-                'Транспорт': vehicle_name[:40] + '...' if len(vehicle_name) > 40 else vehicle_name,
-                'Тип': vehicle_type,
-                'Расход': round(result['energy_kwh'] or result['fuel_liters'], 2),
-                'Единица': 'кВт·ч' if result['energy_kwh'] else 'л',
-                'Выбросы': round(result['emissions'], 2),
-                'Стоимость': round(result['tco'], 2)
-            })
+            if result['fuel_liters'] is not None:
+                plot_data.append({
+                    'Транспорт': name,
+                    'Тип': vehicle_type,
+                    'Расход': round(result['fuel_liters'], 2),
+                    'Единица': 'л',
+                    'Выбросы': round(result['emissions'], 2),
+                    'Стоимость': round(result['tco'], 2)
+                })
+            if result['energy_kwh'] is not None:
+                plot_data.append({
+                    'Транспорт': name,
+                    'Тип': vehicle_type,
+                    'Расход': round(result['energy_kwh'], 2),
+                    'Единица': 'кВт·ч',
+                    'Выбросы': round(result['emissions'], 2),
+                    'Стоимость': round(result['tco'], 2)
+                })
 
         df = pd.DataFrame(plot_data)
 
-        # Общий стиль для всех графиков
+        # Общий стиль и цвета
         common_style = {
             'layout': {
                 'plot_bgcolor': '#f8f9fa',
                 'paper_bgcolor': '#f8f9fa',
                 'font': {'family': 'Arial, sans-serif', 'size': 12},
-                'margin': {'t': 40, 'b': 100, 'l': 60, 'r': 40},
+                'margin': {'t': 40, 'b': 70, 'l': 60, 'r': 40},
                 'xaxis': {'tickangle': -30},
                 'hoverlabel': {'font_size': 12}
             },
             'config': {'displayModeBar': False}
         }
 
-        # 1. График расхода энергии/топлива
-        fig_consumption = px.bar(
-            df,
-            x='Транспорт',
-            y='Расход',
-            color='Тип',
-            color_discrete_map={
-                'ICE': '#3498db',
-                'EV': '#2ecc71',
-                'HEV': '#e74c3c',
-                'PHEV': '#9b59b6'
-            },
-            text=[f"{row['Расход']} {row['Единица']}" for _, row in df.iterrows()],
-            labels={'Расход': 'Значение', 'Транспорт': ''},
-            title='<b>Расход энергии/топлива</b>'
-        )
-        fig_consumption.update_traces(
-            textposition='outside',
-            marker_line_color='rgba(0,0,0,0.3)',
-            marker_line_width=1,
-            textfont_size=11
-        )
-        fig_consumption.update_layout(
-            yaxis_title='Расход (кВт·ч/л)',
-            **common_style['layout']
-        )
+        color_map = {
+            'ICE': '#3498db',
+            'EV': '#2ecc71',
+            'HEV': '#e74c3c',
+            'PHEV': '#9b59b6'
+        }
 
-        # 2. График выбросов CO₂
+        # Топливо
+        df_fuel = df[df['Единица'] == 'л']
+        fig_fuel = px.bar(
+            df_fuel, x='Транспорт', y='Расход', color='Тип', color_discrete_map=color_map,
+            text='Расход', title='<b>Расход топлива (л)</b>'
+        )
+        fig_fuel.update_traces(textposition='outside')
+        fig_fuel.update_layout(yaxis_title='л', **common_style['layout'])
+        fig_fuel.update_yaxes(range=[0, df_fuel['Расход'].max() + 1])
+
+        # Энергия
+        df_energy = df[df['Единица'] == 'кВт·ч']
+        fig_energy = px.bar(
+            df_energy, x='Транспорт', y='Расход', color='Тип', color_discrete_map=color_map,
+            text='Расход', title='<b>Расход энергии (кВт·ч)</b>'
+        )
+        fig_energy.update_traces(textposition='outside')
+        fig_energy.update_layout(yaxis_title='кВт·ч', **common_style['layout'])
+        fig_energy.update_yaxes(range=[0, df['Расход'].max() * 1.1])
+
+        df_unique = df.drop_duplicates(subset=['Транспорт'])
+
+        # Выбросы
         fig_emissions = px.bar(
-            df.sort_values('Выбросы'),
-            x='Транспорт',
-            y='Выбросы',
-            color='Тип',
-            color_discrete_map={
-                'ICE': '#3498db',
-                'EV': '#2ecc71',
-                'HEV': '#e74c3c',
-                'PHEV': '#9b59b6'
-            },
-            text='Выбросы',
-            labels={'Выбросы': 'Выбросы CO₂ (г)', 'Транспорт': ''},
-            title='<b>Выбросы CO₂</b>'
+            df_unique.sort_values('Выбросы'), x='Транспорт', y='Выбросы', color='Тип',
+            color_discrete_map=color_map, text='Выбросы', title='<b>Выбросы CO₂</b>'
         )
-        fig_emissions.update_traces(
-            texttemplate='%{y:.1f}',
-            textposition='outside'
-        )
-        fig_emissions.update_layout(
-            yaxis_title='Выбросы (г)',
-            **common_style['layout']
-        )
+        fig_emissions.update_traces(textposition='outside')
+        fig_emissions.update_layout(yaxis_title='г', **common_style['layout'])
+        fig_emissions.update_yaxes(range=[0, df_unique['Выбросы'].max() * 1.1])
 
-        # 3. График стоимости владения
+        # Стоимость
         fig_cost = px.bar(
-            df.sort_values('Стоимость'),
-            x='Транспорт',
-            y='Стоимость',
-            color='Тип',
-            color_discrete_map={
-                'ICE': '#3498db',
-                'EV': '#2ecc71',
-                'HEV': '#e74c3c',
-                'PHEV': '#9b59b6'
-            },
-            text='Стоимость',
-            labels={'Стоимость': 'Стоимость (руб)', 'Транспорт': ''},
-            title='<b>Стоимость владения</b>'
+            df_unique.sort_values('Стоимость'), x='Транспорт', y='Стоимость', color='Тип',
+            color_discrete_map=color_map, text='Стоимость', title='<b>Стоимость владения</b>'
         )
         fig_cost.update_traces(
             texttemplate='%{y:,.0f}',
             textposition='outside'
         )
-        fig_cost.update_layout(
-            yaxis_title='Стоимость (руб)',
-            **common_style['layout']
-        )
-
-        # Конвертация в HTML
+        fig_cost.update_layout(yaxis_title='руб', **common_style['layout'])
+        fig_cost.update_yaxes(range=[0, df_unique['Стоимость'].max() * 1.1])
         return {
-            'consumption': plot(fig_consumption, output_type='div', config=common_style['config']),
+            'consumption_fuel': plot(fig_fuel, output_type='div', config=common_style['config']),
+            'consumption_energy': plot(fig_energy, output_type='div', config=common_style['config']),
             'emissions': plot(fig_emissions, output_type='div', config=common_style['config']),
-            'cost': plot(fig_cost, output_type='div', config=common_style['config'])
+            'cost': plot(fig_cost, output_type='div', config=common_style['config']),
         }
