@@ -60,7 +60,7 @@ class TCOService:
     @classmethod
     def _calculate_production_cost(cls, vehicle):
         """Стоимость производства (покупная цена)"""
-        return vehicle.production_price
+        return vehicle.production_price*100
 
     @classmethod
     def _calculate_usage_cost(cls, vehicle, distance_km, driving_conditions):

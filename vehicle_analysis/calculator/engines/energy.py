@@ -94,7 +94,8 @@ class EnergyCalculator:
             "efficiency": (vehicle.engine_efficiency * ice_share) + (cls.EV_EFFICIENCY * (1 - ice_share))
         }
 
-    def _calculate_phev_energy(vehicle, distance_km, driving_conditions):
+    @classmethod
+    def _calculate_phev_energy(cls, vehicle, distance_km, driving_conditions):
         """Расчет энергопотребления для PHEV"""
         electric_range_km = vehicle.battery_only_range_km
 

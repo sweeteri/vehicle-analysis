@@ -14,9 +14,9 @@
 }
 
 .chart-container {
-    height: 400px;
-    margin-bottom: 20px;
-    background: white;
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 2rem;
 }
 
 .chart-container .plotly {
