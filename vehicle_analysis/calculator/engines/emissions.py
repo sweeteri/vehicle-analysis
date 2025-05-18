@@ -37,7 +37,7 @@ class EmissionsCalculator:
             )
         elif isinstance(vehicle, PHEVVehicle):
             return cls._calculate_phev_co2(
-                vehicle, distance_km
+                vehicle, distance_km, energy_source
             )
         else:
             raise ValueError(f"Unsupported vehicle type: {type(vehicle)}")
@@ -82,53 +82,36 @@ class EmissionsCalculator:
         Returns:
             Выбросы CO₂ в граммах.
         """
-        # 1. Определяем долю работы ДВС в зависимости от условий движения и параметров авто
         if driving_conditions == "city":
-            # В городе доля ДВС ниже (активная рекуперация). Зависит от массы.
-            ice_share = 0.3 + (vehicle.mass_kg / 2000) * 0.1  # 30-40% для массы 1000-2000 кг
+            ice_share = 0.25
         else:
-            # На трассе доля ДВС выше. Зависит от аэродинамики (frontal_area_m2).
-            c_d = 0.3  # Коэффициент лобового сопротивления (примерный)
-            air_resistance = vehicle.frontal_area_m2 * c_d
-            ice_share = 0.7 + (air_resistance / 0.7) * 0.2  # 70-90%
+            ice_share = 0.6
 
-        # 2. Расход топлива с учётом КПД ДВС и доли его работы
-        fuel_used_liters = (vehicle.fuel_consumption_lp100km * distance_km / 100) * ice_share
-        effective_fuel_used = fuel_used_liters / vehicle.engine_efficiency  # Коррекция на КПД
-
-        # 3. Выбросы CO₂ от сожжённого топлива
-        co2_emissions = effective_fuel_used * vehicle.co2_emissions_gl
-
-        # 4. Поправка на потери при зарядке батареи от ДВС (для трассы)
-        if driving_conditions == "highway":
-            co2_emissions *= 1.15  # +15% из-за КПД генератора и передачи энергии
+        fuel_used = (vehicle.fuel_consumption_lp100km / 100) * distance_km * ice_share
+        co2_emissions = fuel_used * 2.31 * 1000  # г CO2
 
         return co2_emissions
 
     @classmethod
-    def _calculate_phev_co2(cls, vehicle, distance_km):
+    def _calculate_phev_co2(cls, vehicle, distance_km, energy_source):
         """
         Расчет выбросов CO2 для PHEV (все в км и литрах)
         """
-        # пробег на электротяге и ДВС (в км)
-        electricity_co2_per_kwh = 0.5
+        emission_factor = cls.EMISSION_FACTORS.get(energy_source, 300)  # г/кВт·ч
+        electricity_co2_per_kwh = emission_factor / 1000  # кг/кВт·ч
+
         electric_range_km = vehicle.battery_only_range_km
         electric_distance = min(distance_km, electric_range_km)
         ice_distance = max(0, distance_km - electric_range_km)
 
-        # Расчет потребления электроэнергии (кВтч)
         electric_consumption_kwh = (vehicle.kwh_100_km_battery_only / 100) * electric_distance
-
-        # Расчет потребления топлива (л)
-        # Конвертируем MPG в л/100км: 235.214583 / MPG
         fuel_consumption_l_100km = 235.214583 / vehicle.mpg_gas_only
         fuel_consumption_liters = (fuel_consumption_l_100km / 100) * ice_distance
 
-        # Расчет выбросов (кг CO2)
-        electric_co2 = float(electric_consumption_kwh) * float(electricity_co2_per_kwh)  # кг
-        fuel_co2 = float(fuel_consumption_liters) * 2.31  # 2.31 кг CO2 на литр бензина
+        electric_co2_kg = electric_consumption_kwh * electricity_co2_per_kwh
+        fuel_co2_kg = fuel_consumption_liters * 2.31
 
-        return electric_co2 + fuel_co2
+        return (electric_co2_kg + fuel_co2_kg) * 1000  # граммы
 
     @classmethod
     def get_energy_sources(cls):

@@ -51,12 +51,16 @@
                         {% for item in results %}
                             <tr data-consumption="
                                     
-                                    
-                                    
                                     {% if item.energy_kwh %}{{ item.energy_kwh }}{% else %}{{ item.fuel_liters }}{% endif %}"
                                 data-emissions="{{ item.emissions }}"
                                 data-tco="{{ item.tco }}">
-                                <td>{{ item.vehicle.mark_name }} {{ item.vehicle.model_name }}</td>
+                                <td>
+                                    {% if item.vehicle.mark_name %}
+                                        {{ item.vehicle.mark_name }} {{ item.vehicle.model_name }}
+                                    {% else %}
+                                        {{ item.vehicle }}
+                                    {% endif %}
+                                </td>
                                 <td>
                                     {% if item.energy_kwh %}
                                         {{ item.energy_kwh|floatformat:2 }} кВт·ч
