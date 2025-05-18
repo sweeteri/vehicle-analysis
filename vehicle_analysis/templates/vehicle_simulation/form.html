@@ -5,6 +5,19 @@
 <div class="container mt-4">
     <h2 class="mb-4"><i class="fas fa-car me-2"></i>Симулятор эксплуатации ТС</h2>
 
+    {% if form.errors %}
+    <div class="alert alert-danger">
+        <strong>Ошибки в форме:</strong>
+        <ul>
+            {% for field, errors in form.errors.items %}
+                {% for error in errors %}
+                    <li>{{ field }}: {{ error }}</li>
+                {% endfor %}
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
     <form method="post" action="{% url 'vehicle_simulation:simulate' %}" class="needs-validation" novalidate id="simulation-form">
         {% csrf_token %}
 
@@ -15,7 +28,6 @@
             </div>
             <div class="card-body">
                 <div class="btn-group" role="group" aria-label="Тип анализа">
-                    <!-- Радиокнопка для анализа одного ТС -->
                     <input type="radio" class="btn-check" name="analysis_type" id="analysis_type_single"
                            value="single" autocomplete="off"
                            {% if form.analysis_type.value == 'single' %}checked{% endif %}>
@@ -23,7 +35,6 @@
                         <i class="fas fa-car me-1"></i> Одно ТС
                     </label>
 
-                    <!-- Радиокнопка для сравнения типов -->
                     <input type="radio" class="btn-check" name="analysis_type" id="analysis_type_avg"
                            value="type_avg" autocomplete="off"
                            {% if form.analysis_type.value == 'type_avg' %}checked{% endif %}>
@@ -34,7 +45,7 @@
             </div>
         </div>
 
-        <!-- Блок выбора конкретного ТС (виден только при выборе "Одно ТС") -->
+        <!-- Блок выбора конкретного ТС -->
         <div id="single-analysis" class="card mb-4 shadow-sm card-hoverable"
              style="display: {% if form.analysis_type.value == 'single' %}block{% else %}none{% endif %};">
             <div class="card-header bg-info text-white">
@@ -42,7 +53,6 @@
             </div>
             <div class="card-body">
                 <div class="row g-3">
-                    <!-- Блок выбора ДВС -->
                     <div class="col-md-3">
                         <div class="card h-100 border-primary">
                             <div class="card-header bg-primary bg-opacity-10 border-primary">
@@ -50,16 +60,10 @@
                             </div>
                             <div class="card-body">
                                 {{ form.ice_vehicle }}
-                                {% if form.ice_vehicle.errors %}
-                                <div class="invalid-feedback d-block">
-                                    {{ form.ice_vehicle.errors|join:", " }}
-                                </div>
-                                {% endif %}
                             </div>
                         </div>
                     </div>
 
-                    <!-- Блок выбора гибрида -->
                     <div class="col-md-3">
                         <div class="card h-100 border-success">
                             <div class="card-header bg-success bg-opacity-10 border-success">
@@ -67,16 +71,10 @@
                             </div>
                             <div class="card-body">
                                 {{ form.hevv_vehicle }}
-                                {% if form.hevv_vehicle.errors %}
-                                <div class="invalid-feedback d-block">
-                                    {{ form.hevv_vehicle.errors|join:", " }}
-                                </div>
-                                {% endif %}
                             </div>
                         </div>
                     </div>
 
-                    <!-- Блок выбора PHEV -->
                     <div class="col-md-3">
                         <div class="card h-100 border-success">
                             <div class="card-header bg-success bg-opacity-10 border-success">
@@ -84,16 +82,10 @@
                             </div>
                             <div class="card-body">
                                 {{ form.phevv_vehicle }}
-                                {% if form.phevv_vehicle.errors %}
-                                <div class="invalid-feedback d-block">
-                                    {{ form.phevv_vehicle.errors|join:", " }}
-                                </div>
-                                {% endif %}
                             </div>
                         </div>
                     </div>
 
-                    <!-- Блок выбора электромобиля -->
                     <div class="col-md-3">
                         <div class="card h-100 border-warning">
                             <div class="card-header bg-warning bg-opacity-10 border-warning">
@@ -101,11 +93,6 @@
                             </div>
                             <div class="card-body">
                                 {{ form.ev_vehicle }}
-                                {% if form.ev_vehicle.errors %}
-                                <div class="invalid-feedback d-block">
-                                    {{ form.ev_vehicle.errors|join:", " }}
-                                </div>
-                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -113,7 +100,7 @@
             </div>
         </div>
 
-        <!-- Блок выбора типов для сравнения (виден только при выборе "Сравнение типов") -->
+        <!-- Блок выбора типов для сравнения -->
         <div id="type-comparison" class="card mb-4 shadow-sm card-hoverable"
              style="display: {% if form.analysis_type.value == 'type_avg' %}block{% else %}none{% endif %};">
             <div class="card-header bg-info text-white">
@@ -121,49 +108,21 @@
             </div>
             <div class="card-body">
                 <div class="row g-3">
-                    <!-- Чекбокс для ДВС -->
+                    {% for choice in form.compare_types %}
                     <div class="col-md-3">
                         <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" id="compare_ice" name="compare_types"
-                                   value="ICE" {% if 'ICE' in form.compare_types.value or not form.is_bound %}checked{% endif %}>
-                            <label class="form-check-label" for="compare_ice">
-                                <i class="fas fa-gas-pump me-1"></i> ДВС
+                            {{ choice.tag }}
+                            <label class="form-check-label" for="{{ choice.id_for_label }}">
+                                <i class="fas
+                                    {% if choice.choice_value == 'ICE' %}fa-gas-pump
+                                    {% elif choice.choice_value == 'HEV' %}fa-car-battery
+                                    {% elif choice.choice_value == 'PHEV' %}fa-charging-station
+                                    {% else %}fa-bolt{% endif %} me-1"></i>
+                                {{ choice.choice_label }}
                             </label>
                         </div>
                     </div>
-
-                    <!-- Чекбокс для гибридов -->
-                    <div class="col-md-3">
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" id="compare_hev" name="compare_types"
-                                   value="HEV" {% if 'HEV' in form.compare_types.value or not form.is_bound %}checked{% endif %}>
-                            <label class="form-check-label" for="compare_hev">
-                                <i class="fas fa-car-battery me-1"></i> Гибриды
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- Чекбокс для PHEV -->
-                    <div class="col-md-3">
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" id="compare_phev" name="compare_types"
-                                   value="PHEV" {% if 'PHEV' in form.compare_types.value or not form.is_bound %}checked{% endif %}>
-                            <label class="form-check-label" for="compare_phev">
-                                <i class="fas fa-charging-station me-1"></i> PHEV
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- Чекбокс для электромобилей -->
-                    <div class="col-md-3">
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" id="compare_ev" name="compare_types"
-                                   value="EV" {% if 'EV' in form.compare_types.value or not form.is_bound %}checked{% endif %}>
-                            <label class="form-check-label" for="compare_ev">
-                                <i class="fas fa-bolt me-1"></i> Электро
-                            </label>
-                        </div>
-                    </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>
@@ -175,7 +134,6 @@
             </div>
             <div class="card-body">
                 <div class="row g-3">
-                    <!-- Поле для даты начала -->
                     <div class="col-md-6">
                         <label for="{{ form.start_date.id_for_label }}" class="form-label">Дата начала</label>
                         {{ form.start_date }}
@@ -186,7 +144,6 @@
                         {% endif %}
                     </div>
 
-                    <!-- Поле для даты окончания -->
                     <div class="col-md-6">
                         <label for="{{ form.end_date.id_for_label }}" class="form-label">Дата окончания</label>
                         {{ form.end_date }}
@@ -197,13 +154,19 @@
                         {% endif %}
                     </div>
 
-                    <!-- Поле для часов в день -->
                     <div class="col-md-6">
-                        <label for="{{ form.daily_hours.id_for_label }}" class="form-label">Часов в день</label>
-                        <div class="input-group">
-                            {{ form.daily_hours }}
-                            <span class="input-group-text">ч/день</span>
+                        <label for="{{ form.daily_distance.id_for_label }}" class="form-label">Дневной пробег (км)</label>
+                        {{ form.daily_distance }}
+                        {% if form.daily_distance.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.daily_distance.errors|join:", " }}
                         </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="{{ form.daily_hours.id_for_label }}" class="form-label">Часов эксплуатации в день</label>
+                        {{ form.daily_hours }}
                         {% if form.daily_hours.errors %}
                         <div class="invalid-feedback d-block">
                             {{ form.daily_hours.errors|join:", " }}
@@ -211,7 +174,6 @@
                         {% endif %}
                     </div>
 
-                    <!-- Поле для источника энергии -->
                     <div class="col-md-6">
                         <label for="{{ form.energy_source.id_for_label }}" class="form-label">Источник энергии</label>
                         {{ form.energy_source }}
@@ -221,11 +183,20 @@
                         </div>
                         {% endif %}
                     </div>
+
+                    <div class="col-md-6">
+                        <label for="{{ form.driving_conditions.id_for_label }}" class="form-label">Условия движения</label>
+                        {{ form.driving_conditions }}
+                        {% if form.driving_conditions.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.driving_conditions.errors|join:", " }}
+                        </div>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Кнопка отправки формы -->
         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
             <button type="submit" class="btn btn-lg btn-warning btn-calculate">
                 <i class="fas fa-play me-2"></i> Запустить симуляцию
@@ -234,22 +205,19 @@
     </form>
 </div>
 
-<!-- JavaScript для обработки формы -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Элементы для переключения
+    // Переключение между типами анализа
     const analysisTypeRadios = document.querySelectorAll('input[name="analysis_type"]');
     const singleAnalysisDiv = document.getElementById('single-analysis');
     const typeComparisonDiv = document.getElementById('type-comparison');
 
-    // Функция переключения видимости блоков
     function toggleAnalysisBlocks() {
         const selectedValue = document.querySelector('input[name="analysis_type"]:checked').value;
         singleAnalysisDiv.style.display = selectedValue === 'single' ? 'block' : 'none';
         typeComparisonDiv.style.display = selectedValue === 'type_avg' ? 'block' : 'none';
     }
 
-    // Назначение обработчиков на радиокнопки
     analysisTypeRadios.forEach(radio => {
         radio.addEventListener('change', toggleAnalysisBlocks);
     });
@@ -257,14 +225,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Инициализация при загрузке
     toggleAnalysisBlocks();
 
-    // Отладочный вывод при отправке формы
+    // Отладка отправки формы
     const form = document.getElementById('simulation-form');
     form.addEventListener('submit', function() {
-        console.log('Отправка формы, выбранные типы:',
-            Array.from(document.querySelectorAll('input[name="compare_types"]:checked'))
-            .map(el => el.value));
+        console.log('Отправка формы, данные:', new FormData(form));
     });
 });
 </script>
-
 {% endblock %}

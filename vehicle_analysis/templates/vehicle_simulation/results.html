@@ -1,3 +1,8 @@
+{% extends "includes/base.html" %}
+{% load static %}
+{% load vehicle_tags %}
+
+{% block content %}
 {% if show_results %}
 <div class="mt-5 card shadow-sm">
     <div class="card-header bg-success text-white">
@@ -5,20 +10,28 @@
     </div>
     <div class="card-body">
         {% if results %}
-            <!-- Информация о периоде -->
+            <!-- Информация о параметрах симуляции -->
             <div class="alert alert-info mb-4">
                 <div class="row">
                     <div class="col-md-4">
                         <i class="fas fa-calendar-alt me-2"></i>
-                        <strong>Период:</strong> {{ form.start_date.value }} - {{ form.end_date.value }}
+                        <strong>Период:</strong> {{ simulation_params.start_date }} - {{ simulation_params.end_date }}
+                    </div>
+                    <div class="col-md-4">
+                        <i class="fas fa-road me-2"></i>
+                        <strong>Дневной пробег:</strong> {{ simulation_params.daily_distance }} км
                     </div>
                     <div class="col-md-4">
                         <i class="fas fa-clock me-2"></i>
-                        <strong>Часов в день:</strong> {{ form.daily_hours.value }}
+                        <strong>Часов в день:</strong> {{ simulation_params.daily_hours }}
                     </div>
                     <div class="col-md-4">
                         <i class="fas fa-plug me-2"></i>
-                        <strong>Энергия:</strong> {{ form.energy_source.value }}
+                        <strong>Энергия:</strong> {{ simulation_params.energy_source }}
+                    </div>
+                    <div class="col-md-4">
+                        <i class="fas fa-car me-2"></i>
+                        <strong>Условия:</strong> {{ simulation_params.driving_conditions }}
                     </div>
                 </div>
             </div>
@@ -48,8 +61,8 @@
                     <thead class="table-light">
                         <tr>
                             <th>Транспортное средство</th>
-                            <th class="sortable" data-sort="consumption">
-                                Расход <span class="sort-arrow">↕</span>
+                            <th class="sortable" data-sort="energy">
+                                Энергия <span class="sort-arrow">↕</span>
                             </th>
                             <th class="sortable" data-sort="emissions">
                                 Выбросы CO₂ <span class="sort-arrow">↕</span>
@@ -62,22 +75,28 @@
                     </thead>
                     <tbody>
                         {% for item in results %}
-                        <tr data-consumption="{% if item.energy_kwh %}{{ item.energy_kwh }}{% else %}{{ item.fuel_liters }}{% endif %}"
-                            data-emissions="{{ item.emissions }}"
-                            data-cost="{{ item.tco }}">
+                        <tr data-energy="{{ item.daily_data.energy.total_energy_mj|default:0 }}"
+                            data-emissions="{{ item.daily_data.emissions }}"
+                            data-cost="{{ item.daily_data.cost }}">
                             <td>
                                 <strong>{{ item.vehicle.mark_name }} {{ item.vehicle.model_name }}</strong><br>
-                                <small class="text-muted">{{ item.vehicle.get_engine_type_display }}</small>
+                                <small class="text-muted">
+                                    {% if item.vehicle|isinstance:"ICEVehicle" %}ДВС
+                                    {% elif item.vehicle|isinstance:"EVVehicle" %}Электро
+                                    {% elif item.vehicle|isinstance:"HEVVehicle" %}Гибрид
+                                    {% elif item.vehicle|isinstance:"PHEVVehicle" %}PHEV
+                                    {% endif %}
+                                </small>
                             </td>
                             <td>
-                                {% if item.energy_kwh %}
-                                    {{ item.energy_kwh|floatformat:2 }} <small>кВт·ч</small>
+                                {% if item.daily_data.energy.energy_kwh %}
+                                    {{ item.daily_data.energy.energy_kwh|floatformat:2 }} <small>кВт·ч</small>
                                 {% else %}
-                                    {{ item.fuel_liters|floatformat:2 }} <small>л</small>
+                                    {{ item.daily_data.energy.fuel_liters|floatformat:2 }} <small>л</small>
                                 {% endif %}
                             </td>
-                            <td>{{ item.emissions|floatformat:2 }} <small>г CO₂</small></td>
-                            <td>{{ item.tco|floatformat:2 }} <small>руб</small></td>
+                            <td>{{ item.daily_data.emissions|floatformat:2 }} <small>г CO₂</small></td>
+                            <td>{{ item.daily_data.cost|floatformat:2 }} <small>руб</small></td>
                             <td>
                                 <button class="btn btn-sm btn-outline-primary details-btn"
                                         data-bs-toggle="collapse"
@@ -95,8 +114,10 @@
                                             <strong>Энергия:</strong><br>
                                             {% if item.daily_data.energy.energy_kwh %}
                                                 {{ item.daily_data.energy.energy_kwh|floatformat:2 }} кВт·ч
+                                                ({{ item.daily_data.energy.total_energy_mj|floatformat:2 }} МДж)
                                             {% else %}
                                                 {{ item.daily_data.energy.fuel_liters|floatformat:2 }} л
+                                                ({{ item.daily_data.energy.total_energy_mj|floatformat:2 }} МДж)
                                             {% endif %}
                                         </div>
                                         <div class="col-md-4">
@@ -105,7 +126,7 @@
                                         </div>
                                         <div class="col-md-4">
                                             <strong>Стоимость:</strong><br>
-                                            {{ item.daily_data.cost.total|floatformat:2 }} руб
+                                            {{ item.daily_data.cost|floatformat:2 }} руб
                                         </div>
                                     </div>
                                 </div>
@@ -154,3 +175,4 @@
 
 <script src="{% static 'vehicle_simulation/js/table_sort.js' %}"></script>
 {% endif %}
+{% endblock %}
