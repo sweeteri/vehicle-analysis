@@ -2,11 +2,9 @@
 {% load static %}
 
 {% block content %}
-<div class="container mt-4">
     {% include "vehicle_simulation/form.html" %}
 
     {% if show_results %}
         {% include "vehicle_simulation/results.html" %}
     {% endif %}
-</div>
 {% endblock %}
