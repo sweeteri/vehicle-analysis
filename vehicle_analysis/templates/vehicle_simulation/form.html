@@ -205,40 +205,7 @@
         </div>
     </form>
 </div>
-
-<style>
-    /* Снимаем двойную границу между соседними карточками */
-    .card + .card {
-        border-top: none;
-        margin-top: -1px;
-    }
-</style>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Переключение между типами анализа
-    const analysisTypeRadios = document.querySelectorAll('input[name="analysis_type"]');
-    const singleAnalysisDiv = document.getElementById('single-analysis');
-    const typeComparisonDiv = document.getElementById('type-comparison');
-
-    function toggleAnalysisBlocks() {
-        const selectedValue = document.querySelector('input[name="analysis_type"]:checked').value;
-        singleAnalysisDiv.style.display = selectedValue === 'single' ? 'block' : 'none';
-        typeComparisonDiv.style.display = selectedValue === 'type_avg' ? 'block' : 'none';
-    }
-
-    analysisTypeRadios.forEach(radio => {
-        radio.addEventListener('change', toggleAnalysisBlocks);
-    });
-
-    // Инициализация при загрузке
-    toggleAnalysisBlocks();
-
-    // Отладка отправки формы
-    const form = document.getElementById('simulation-form');
-    form.addEventListener('submit', function() {
-        console.log('Отправка формы, данные:', new FormData(form));
-    });
-});
-</script>
+    
+<link rel="stylesheet" href="{% static 'vehicle_simulation/css/form.css' %}">
+<script src="{% static 'vehicle_simulation/js/form_handlers.js' %}"></script>
 {% endblock %}
