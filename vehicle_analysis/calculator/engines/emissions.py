@@ -93,7 +93,7 @@ class EmissionsCalculator:
         return co2_emissions
 
     @classmethod
-    def _calculate_phev_co2(cls, vehicle, distance_km):
+    def _calculate_phev_co2(cls, vehicle, distance_km, energy_source):
         """
         Расчет выбросов CO2 для PHEV (все в км и литрах)
         """
