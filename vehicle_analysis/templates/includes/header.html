@@ -1,3 +1,4 @@
+{% load static %}
 <header class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top shadow-sm">
     <div class="container">
         <a class="navbar-brand d-flex align-items-center" href="{% url 'vehicles:vehicle_list' %}">
@@ -10,63 +11,29 @@
         </button>
 
         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav me-auto">  
+            <ul class="navbar-nav me-auto" id="mainNav">  
                 <li class="nav-item">
-                    <a class="nav-link {% if view_name == 'vehicles:vehicle_list' %}active{% endif %}"
-                       href="{% url 'vehicles:vehicle_list' %}">
+                    <a class="nav-link" href="{% url 'vehicles:vehicle_list' %}">
                         <i class="fas fa-list me-1"></i> Каталог авто
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {% if request.resolver_match.url_name == 'calculator:calculator' %}active{% endif %}"
-                       href="{% url 'calculator:calculator' %}">
+                    <a class="nav-link" href="{% url 'calculator:calculator' %}">
                         <i class="fas fa-calculator me-1"></i> Калькулятор
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {% if 'vehicle_simulation' in request.resolver_match.namespace %}active{% endif %}"
-                       href="{% url 'vehicle_simulation:simulate' %}">
+                    <a class="nav-link" href="{% url 'vehicle_simulation:simulate' %}">
                         <i class="fas fa-chart-line me-1"></i> Симулятор
                     </a>
                 </li>
             </ul>
-
-            <!-- Дополнительные элементы управления -->
-            <div class="d-flex">
-                <a href="#" class="btn btn-outline-light btn-sm">
-                    <i class="fas fa-user me-1"></i> Вход
-                </a>
-            </div>
         </div>
     </div>
 </header>
 
-<style>
-    /* Стили для активной вкладки симулятора */
-    .nav-link.active[href*="vehicle_simulation"] {
-        color: #20c997 !important;
-        position: relative;
-    }
-    .nav-link.active[href*="vehicle_simulation"]:after {
-        content: "";
-        position: absolute;
-        bottom: -1px;
-        left: 0;
-        width: 100%;
-        height: 2px;
-        background: #20c997;
-        animation: underline-grow 0.3s ease-out;
-    }
+<!-- Подключаем CSS -->
+<link rel="stylesheet" href="{% static 'css/navbar.css' %}">
 
-    /* Анимация подчеркивания */
-    @keyframes underline-grow {
-        from { width: 0; }
-        to { width: 100%; }
-    }
-
-    /* Эффект при наведении */
-    .nav-link:hover:not(.active) {
-        transform: translateY(-1px);
-        transition: all 0.2s ease;
-    }
-</style>
+<!-- Подключаем JS в конце body -->
+<script src="{% static 'js/navbar.js' %}"></script>

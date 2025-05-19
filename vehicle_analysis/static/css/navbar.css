@@ -1,0 +1,28 @@
+/* Стили для активной вкладки */
+.navbar-nav .nav-item .nav-link.active {
+    color: #20c997 !important;
+    position: relative;
+}
+
+.navbar-nav .nav-item .nav-link.active::after {
+    content: "";
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: #20c997;
+    animation: underline-grow 0.3s ease-out;
+}
+
+@keyframes underline-grow {
+    from { width: 0; }
+    to { width: 100%; }
+}
+
+/* Эффект при наведении */
+.navbar-nav .nav-item .nav-link:not(.active):hover {
+    transform: translateY(-1px);
+    opacity: 0.9;
+    transition: transform 0.2s ease;
+}
