@@ -1,0 +1,10 @@
+{% extends "includes/base.html" %}
+{% load static %}
+
+{% block content %}
+    {% include "vehicle_simulation/form.html" %}
+
+    {% if show_results %}
+        {% include "vehicle_simulation/results.html" %}
+    {% endif %}
+{% endblock %}

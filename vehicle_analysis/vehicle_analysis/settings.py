@@ -22,7 +22,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'vehicles',
     'calculator',
-    'import_export'
+    'import_export',
+    'vehicle_simulation'
 ]
 
 MIDDLEWARE = [
@@ -32,7 +33,7 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware'
 ]
 
 ROOT_URLCONF = 'vehicle_analysis.urls'
@@ -40,9 +41,7 @@ ROOT_URLCONF = 'vehicle_analysis.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [
-            os.path.join(BASE_DIR, 'templates'),
-        ],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -87,6 +86,9 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = 'static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),  # Без лишних скобок
+]
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 STATIC_ROOT = os.path.join(PROJECT_DIR, 'static')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
