@@ -1,211 +1,214 @@
-{% extends "includes/base.html" %}
 {% load static %}
 
 {% block content %}
-<div class="container mt-4">
-    <h2 class="mb-4"><i class="fas fa-car me-2"></i>Симулятор эксплуатации ТС</h2>
+    <div class="container mt-4">
+        <h2 class="mb-4"><i class="fas fa-car me-2"></i>Симулятор эксплуатации ТС</h2>
 
-    {% if form.errors %}
-    <div class="alert alert-danger">
-        <strong>Ошибки в форме:</strong>
-        <ul>
-            {% for field, errors in form.errors.items %}
-                {% for error in errors %}
-                    <li>{{ field }}: {{ error }}</li>
-                {% endfor %}
-            {% endfor %}
-        </ul>
-    </div>
-    {% endif %}
-
-    <form method="post" action="{% url 'vehicle_simulation:simulate' %}"
-          class="needs-validation" novalidate id="simulation-form">
-        {% csrf_token %}
-
-        <!-- Блок выбора типа анализа -->
-        <div class="card mb-4 shadow-sm">
-            <div class="card-header bg-primary text-white">
-                <h4 class="my-0 fw-normal"><i class="fas fa-chart-pie me-2"></i>Тип анализа</h4>
+        {% if form.errors %}
+            <div class="alert alert-danger">
+                <strong>Ошибки в форме:</strong>
+                <ul>
+                    {% for field, errors in form.errors.items %}
+                        {% for error in errors %}
+                            <li>{{ field }}: {{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                </ul>
             </div>
-            <div class="card-body">
-                <div class="btn-group" role="group" aria-label="Тип анализа">
-                    <input type="radio" class="btn-check" name="analysis_type" id="analysis_type_single"
-                           value="single" autocomplete="off"
-                           {% if form.analysis_type.value == 'single' %}checked{% endif %}>
-                    <label class="btn btn-outline-primary" for="analysis_type_single">
-                        <i class="fas fa-car me-1"></i> Одно ТС
-                    </label>
+        {% endif %}
 
-                    <input type="radio" class="btn-check" name="analysis_type" id="analysis_type_avg"
-                           value="type_avg" autocomplete="off"
-                           {% if form.analysis_type.value == 'type_avg' %}checked{% endif %}>
-                    <label class="btn btn-outline-primary" for="analysis_type_avg">
-                        <i class="fas fa-clone me-1"></i> Сравнение типов
-                    </label>
+        <form method="post" action="{% url 'vehicle_simulation:simulate' %}"
+              class="needs-validation" novalidate id="simulation-form">
+            {% csrf_token %}
+
+            <!-- Блок выбора типа анализа -->
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="my-0 fw-normal"><i class="fas fa-chart-pie me-2"></i>Тип анализа</h4>
                 </div>
-            </div>
-        </div>
+                <div class="card-body">
+                    <div class="btn-group" role="group" aria-label="Тип анализа">
+                        <input type="radio" class="btn-check" name="analysis_type" id="analysis_type_single"
+                               value="single" autocomplete="off"
+                               {% if form.analysis_type.value == 'single' %}checked{% endif %}>
+                        <label class="btn btn-outline-primary" for="analysis_type_single">
+                            <i class="fas fa-car me-1"></i> Одно ТС
+                        </label>
 
-        <!-- Блок выбора конкретного ТС -->
-        <div id="single-analysis" class="card mb-4 shadow-sm card-hoverable"
-             style="display: {% if form.analysis_type.value == 'single' %}block{% else %}none{% endif %};">
-            <div class="card-header bg-info text-white">
-                <h4 class="my-0 fw-normal"><i class="fas fa-car me-2"></i>Выбор транспортного средства</h4>
-            </div>
-            <div class="card-body">
-                <div class="row g-3">
-                    <div class="col-md-3">
-                        <div class="card h-100 border-primary">
-                            <div class="card-header bg-primary bg-opacity-10 border-primary">
-                                <h5 class="mb-0"><i class="fas fa-gas-pump me-2"></i>ДВС</h5>
-                            </div>
-                            <div class="card-body">
-                                {{ form.ice_vehicle }}
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-3">
-                        <div class="card h-100 border-success">
-                            <div class="card-header bg-success bg-opacity-10 border-success">
-                                <h5 class="mb-0"><i class="fas fa-car-battery me-2"></i>Гибрид</h5>
-                            </div>
-                            <div class="card-body">
-                                {{ form.hevv_vehicle }}
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-3">
-                        <div class="card h-100 border-success">
-                            <div class="card-header bg-success bg-opacity-10 border-success">
-                                <h5 class="mb-0"><i class="fas fa-charging-station me-2"></i>PHEV</h5>
-                            </div>
-                            <div class="card-body">
-                                {{ form.phevv_vehicle }}
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-3">
-                        <div class="card h-100 border-warning">
-                            <div class="card-header bg-warning bg-opacity-10 border-warning">
-                                <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Электро</h5>
-                            </div>
-                            <div class="card-body">
-                                {{ form.ev_vehicle }}
-                            </div>
-                        </div>
+                        <input type="radio" class="btn-check" name="analysis_type" id="analysis_type_avg"
+                               value="type_avg" autocomplete="off"
+                               {% if form.analysis_type.value == 'type_avg' %}checked{% endif %}>
+                        <label class="btn btn-outline-primary" for="analysis_type_avg">
+                            <i class="fas fa-clone me-1"></i> Сравнение типов
+                        </label>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Блок выбора типов для сравнения -->
-        <div id="type-comparison" class="card mb-4 shadow-sm card-hoverable"
-             style="display: {% if form.analysis_type.value == 'type_avg' %}block{% else %}none{% endif %};">
-            <div class="card-header bg-info text-white">
-                <h4 class="my-0 fw-normal"><i class="fas fa-filter me-2"></i>Какие типы сравнивать</h4>
+            <!-- Блок выбора конкретного ТС -->
+            <div id="single-analysis" class="card mb-4 shadow-sm card-hoverable"
+                 style="display: {% if form.analysis_type.value == 'single' %}block{% else %}none{% endif %};">
+                <div class="card-header bg-info text-white">
+                    <h4 class="my-0 fw-normal"><i class="fas fa-car me-2"></i>Выбор транспортного средства</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <div class="card h-100 border-primary">
+                                <div class="card-header bg-primary bg-opacity-10 border-primary">
+                                    <h5 class="mb-0"><i class="fas fa-gas-pump me-2"></i>ДВС</h5>
+                                </div>
+                                <div class="card-body">
+                                    {{ form.ice_vehicle }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="card h-100 border-success">
+                                <div class="card-header bg-success bg-opacity-10 border-success">
+                                    <h5 class="mb-0"><i class="fas fa-car-battery me-2"></i>Гибрид</h5>
+                                </div>
+                                <div class="card-body">
+                                    {{ form.hevv_vehicle }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="card h-100 border-success">
+                                <div class="card-header bg-success bg-opacity-10 border-success">
+                                    <h5 class="mb-0"><i class="fas fa-charging-station me-2"></i>Заряжаемый гибрид</h5>
+                                </div>
+                                <div class="card-body">
+                                    {{ form.phevv_vehicle }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="card h-100 border-warning">
+                                <div class="card-header bg-warning bg-opacity-10 border-warning">
+                                    <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Электро</h5>
+                                </div>
+                                <div class="card-body">
+                                    {{ form.ev_vehicle }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="card-body">
-                <div class="row g-3">
-                    {% for choice in form.compare_types %}
-                    <div class="col-md-3">
-                        <div class="form-check form-switch">
-                            {{ choice.tag }}
-                            <label class="form-check-label" for="{{ choice.id_for_label }}">
-                                <i class="fas
+
+            <!-- Блок выбора типов для сравнения -->
+            <div id="type-comparison" class="card mb-4 shadow-sm card-hoverable"
+                 style="display: {% if form.analysis_type.value == 'type_avg' %}block{% else %}none{% endif %};">
+                <div class="card-header bg-info text-white">
+                    <h4 class="my-0 fw-normal"><i class="fas fa-filter me-2"></i>Какие типы сравнивать</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        {% for choice in form.compare_types %}
+                            <div class="col-md-3">
+                                <div class="form-check form-switch">
+                                    {{ choice.tag }}
+                                    <label class="form-check-label" for="{{ choice.id_for_label }}">
+                                        <i class="fas
                                     {% if choice.choice_value == 'ICE' %}fa-gas-pump
                                     {% elif choice.choice_value == 'HEV' %}fa-car-battery
                                     {% elif choice.choice_value == 'PHEV' %}fa-charging-station
                                     {% else %}fa-bolt{% endif %} me-1"></i>
-                                {{ choice.choice_label }}
-                            </label>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
-
-        <!-- Блок параметров симуляции -->
-        <div class="card mb-4 shadow-sm card-hoverable">
-            <div class="card-header bg-success text-white">
-                <h4 class="my-0 fw-normal"><i class="fas fa-sliders-h me-2"></i>Параметры симуляции</h4>
-            </div>
-            <div class="card-body">
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <label for="{{ form.start_date.id_for_label }}" class="form-label">Дата начала</label>
-                        {{ form.start_date }}
-                        {% if form.start_date.errors %}
-                        <div class="invalid-feedback d-block">
-                            {{ form.start_date.errors|join:", " }}
-                        </div>
-                        {% endif %}
-                    </div>
-
-                    <div class="col-md-6">
-                        <label for="{{ form.end_date.id_for_label }}" class="form-label">Дата окончания</label>
-                        {{ form.end_date }}
-                        {% if form.end_date.errors %}
-                        <div class="invalid-feedback d-block">
-                            {{ form.end_date.errors|join:", " }}
-                        </div>
-                        {% endif %}
-                    </div>
-
-                    <div class="col-md-6">
-                        <label for="{{ form.daily_distance.id_for_label }}" class="form-label">Дневной пробег (км)</label>
-                        {{ form.daily_distance }}
-                        {% if form.daily_distance.errors %}
-                        <div class="invalid-feedback d-block">
-                            {{ form.daily_distance.errors|join:", " }}
-                        </div>
-                        {% endif %}
-                    </div>
-
-                    <div class="col-md-6">
-                        <label for="{{ form.daily_hours.id_for_label }}" class="form-label">Часов эксплуатации в день</label>
-                        {{ form.daily_hours }}
-                        {% if form.daily_hours.errors %}
-                        <div class="invalid-feedback d-block">
-                            {{ form.daily_hours.errors|join:", " }}
-                        </div>
-                        {% endif %}
-                    </div>
-
-                    <div class="col-md-6">
-                        <label for="{{ form.energy_source.id_for_label }}" class="form-label">Источник энергии</label>
-                        {{ form.energy_source }}
-                        {% if form.energy_source.errors %}
-                        <div class="invalid-feedback d-block">
-                            {{ form.energy_source.errors|join:", " }}
-                        </div>
-                        {% endif %}
-                    </div>
-
-                    <div class="col-md-6">
-                        <label for="{{ form.driving_conditions.id_for_label }}" class="form-label">Условия движения</label>
-                        {{ form.driving_conditions }}
-                        {% if form.driving_conditions.errors %}
-                        <div class="invalid-feedback d-block">
-                            {{ form.driving_conditions.errors|join:", " }}
-                        </div>
-                        {% endif %}
+                                        {{ choice.choice_label }}
+                                    </label>
+                                </div>
+                            </div>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-            <button type="submit" class="btn btn-lg btn-warning btn-calculate">
-                <i class="fas fa-play me-2"></i> Запустить симуляцию
-            </button>
-        </div>
-    </form>
-</div>
-    
-<link rel="stylesheet" href="{% static 'vehicle_simulation/css/form.css' %}">
-<script src="{% static 'vehicle_simulation/js/form_handlers.js' %}"></script>
+            <!-- Блок параметров симуляции -->
+            <div class="card mb-4 shadow-sm card-hoverable">
+                <div class="card-header bg-success text-white">
+                    <h4 class="my-0 fw-normal"><i class="fas fa-sliders-h me-2"></i>Параметры симуляции</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.start_date.id_for_label }}" class="form-label">Дата начала</label>
+                            {{ form.start_date }}
+                            {% if form.start_date.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.start_date.errors|join:", " }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="{{ form.end_date.id_for_label }}" class="form-label">Дата окончания</label>
+                            {{ form.end_date }}
+                            {% if form.end_date.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.end_date.errors|join:", " }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="{{ form.daily_distance.id_for_label }}" class="form-label">Дневной пробег
+                                (км)</label>
+                            {{ form.daily_distance }}
+                            {% if form.daily_distance.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.daily_distance.errors|join:", " }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="{{ form.daily_hours.id_for_label }}" class="form-label">Часов эксплуатации в
+                                день</label>
+                            {{ form.daily_hours }}
+                            {% if form.daily_hours.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.daily_hours.errors|join:", " }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="{{ form.energy_source.id_for_label }}" class="form-label">Источник
+                                энергии</label>
+                            {{ form.energy_source }}
+                            {% if form.energy_source.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.energy_source.errors|join:", " }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="{{ form.driving_conditions.id_for_label }}" class="form-label">Условия
+                                движения</label>
+                            {{ form.driving_conditions }}
+                            {% if form.driving_conditions.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.driving_conditions.errors|join:", " }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <button type="submit" class="btn btn-lg btn-warning btn-calculate">
+                    <i class="fas fa-play me-2"></i> Запустить симуляцию
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <link rel="stylesheet" href="{% static 'vehicle_simulation/css/form.css' %}">
+    <script src="{% static 'vehicle_simulation/js/form_handlers.js' %}"></script>
 {% endblock %}
