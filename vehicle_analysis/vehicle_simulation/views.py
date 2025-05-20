@@ -3,7 +3,6 @@ from django.views.generic import FormView
 from django.urls import reverse_lazy
 from django.shortcuts import render
 from datetime import datetime
-from math import ceil
 from .forms import VehicleSelectForm
 from .engines.simulator import run_simulation
 
@@ -18,9 +17,9 @@ class SimulationView(FormView):
         if not self.request.POST:
             ctx['form'] = self.form_class(initial={
                 'start_date': datetime.now().date(),
-                'end_date':   (datetime.now().date()),
+                'end_date': (datetime.now().date()),
                 'daily_distance': 50,
-                'daily_hours':    8,
+                'daily_hours': 8,
                 'energy_source': 'eu_avg',
                 'driving_conditions': 'mixed',
                 'compare_types': ['ICE', 'HEV', 'PHEV', 'EV']
@@ -39,30 +38,26 @@ class SimulationView(FormView):
 
         # параметры симуляции
         start_date = data['start_date']
-        end_date   = data['end_date']
-        # считаем, сколько полных дней +1 (включительно)
-        total_days = (end_date - start_date).days + 1
-        # переводим дни в «месяцы» по 30 дн.
-        months = total_days / 30.0
+        end_date = data['end_date']
 
-        daily_km   = data['daily_distance']
-        cond       = data.get('driving_conditions', 'mixed')
-        source     = data['energy_source']
-        use_recup  = data.get('use_recuperation', True)
-        urban_share= data.get('urban_share', 0.5)
+        daily_km = data['daily_distance']
+        cond = data.get('driving_conditions', 'mixed')
+        source = data['energy_source']
+        use_recup = data.get('use_recuperation', True)
+        urban_share = data.get('urban_share', 0.5)
 
         results = []
         for v in vehicles:
             sim = run_simulation(
-                vehicle = v,
-                start_date = start_date,
-                end_date = end_date,
-                daily_km = daily_km,
-                driving_conditions = cond,
-                energy_source = source,
-                use_recuperation = use_recup,
-                urban_share = urban_share
-                )
+                vehicle=v,
+                start_date=start_date,
+                end_date=end_date,
+                daily_km=daily_km,
+                driving_conditions=cond,
+                energy_source=source,
+                use_recuperation=use_recup,
+                urban_share=urban_share
+            )
 
             # считаем суммарные показатели
             total_energy = sum(
@@ -70,24 +65,24 @@ class SimulationView(FormView):
                                   day['energy'].get('energy_kwh', 0) * 3.6)
                 for day in sim
             )
-            total_co2  = sum(day['co2_g'] for day in sim)
+            total_co2 = sum(day['co2_g'] for day in sim)
             total_cost = sum(day['cost_rub'] for day in sim)
 
             results.append({
                 'vehicle': v,
-                'daily':   sim,
+                'daily': sim,
                 'summary': {
                     'energy_mj': total_energy,
-                    'co2_g':     total_co2,
-                    'cost_rub':  total_cost
+                    'co2_g': total_co2,
+                    'cost_rub': total_cost
                 }
             })
 
         context = {
-            'form':         form,
+            'form': form,
             'show_results': True,
-            'results':      results,
-            'plots':        self._generate_plots(results),
+            'results': results,
+            'plots': self._generate_plots(results),
         }
         return render(self.request, self.template_name, context)
 
@@ -141,15 +136,15 @@ class SimulationView(FormView):
 
         default_height = 350
         figs = {
-            'fuel':     go.Figure(layout={'height': default_height}),
+            'fuel': go.Figure(layout={'height': default_height}),
             'electric': go.Figure(layout={'height': default_height}),
-            'emissions':go.Figure(layout={'height': default_height}),
-            'cost':     go.Figure(layout={'height': default_height}),
+            'emissions': go.Figure(layout={'height': default_height}),
+            'cost': go.Figure(layout={'height': default_height}),
         }
         colors = ['#3498db', '#2ecc71', '#e74c3c', '#9b59b6']
 
         for idx, item in enumerate(results):
-            v    = item['vehicle']
+            v = item['vehicle']
             name = f"{v.mark_name} {v.model_name}"
             dates = [d['date'] for d in item['daily']]
 

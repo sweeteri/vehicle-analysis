@@ -3,6 +3,7 @@ from vehicles.models import ICEVehicle, EVVehicle, HEVVehicle, PHEVVehicle
 
 register = template.Library()
 
+
 @register.filter
 def isinstance(value, class_str):
     if class_str == "ICEVehicle":

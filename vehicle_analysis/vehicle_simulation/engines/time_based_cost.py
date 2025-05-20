@@ -1,7 +1,8 @@
 from datetime import timedelta
-import math, random
-from vehicles.models import ICEVehicle, EVVehicle, HEVVehicle, PHEVVehicle
+import math
+import random
 from calculator.engines.cost import TCOService
+
 
 def simulate_daily_cost(vehicle, start_date, end_date, daily_km, driving_conditions='mixed'):
     results = []

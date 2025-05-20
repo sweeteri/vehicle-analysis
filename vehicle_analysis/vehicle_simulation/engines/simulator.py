@@ -2,6 +2,7 @@ from .time_based_energy import simulate_daily_energy
 from .time_based_emissions import simulate_daily_emissions
 from .time_based_cost import simulate_daily_cost
 
+
 def run_simulation(vehicle,
                    start_date,
                    end_date,
@@ -23,9 +24,9 @@ def run_simulation(vehicle,
     combined = []
     for ener, emis, cost in zip(e, em, c):
         combined.append({
-            'date':    ener['date'],
-            'energy':  ener,
-            'co2_g':   emis['co2_g'],
-            'cost_rub':cost['cost_rub'],
+            'date': ener['date'],
+            'energy': ener,
+            'co2_g': emis['co2_g'],
+            'cost_rub': cost['cost_rub'],
         })
     return combined

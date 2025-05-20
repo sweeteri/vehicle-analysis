@@ -1,5 +1,4 @@
 from django import forms
-from django.core.exceptions import ValidationError
 from datetime import datetime, timedelta
 from vehicles.models import ICEVehicle, HEVVehicle, PHEVVehicle, EVVehicle
 from calculator.engines.emissions import EmissionsCalculator

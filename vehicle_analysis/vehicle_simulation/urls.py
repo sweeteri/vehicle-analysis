@@ -3,6 +3,7 @@ from . import views
 from django.views import View
 from django.http import JsonResponse
 
+
 class TestPostView(View):
     def post(self, request):
         print("Получен POST-запрос! Данные:", request.POST)
