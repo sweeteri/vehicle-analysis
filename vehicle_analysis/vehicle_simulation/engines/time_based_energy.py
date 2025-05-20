@@ -1,13 +1,14 @@
 from datetime import timedelta
-import math, random
-from vehicles.models import ICEVehicle, EVVehicle, HEVVehicle, PHEVVehicle
+import math
+import random
 from calculator.engines.energy import EnergyCalculator
+
 
 def simulate_daily_energy(vehicle, start_date, end_date, daily_km, driving_conditions='mixed'):
     results = []
     current = start_date
-    alpha = 0.1    # амплитуда сезонного колебания ±10%
-    sigma = 0.03   # стандартное отклонение шума 3%
+    alpha = 0.1  # амплитуда сезонного колебания ±10%
+    sigma = 0.03  # стандартное отклонение шума 3%
 
     while current <= end_date:
         # базовый расчёт

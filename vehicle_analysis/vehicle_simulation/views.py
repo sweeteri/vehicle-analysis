@@ -111,11 +111,14 @@ class SimulationView(FormView):
             return None
         numeric_fields = [
             f.name for f in model._meta.get_fields()
-            if hasattr(f, 'get_internal_type') and
-               f.get_internal_type() in [
-                   'IntegerField', 'FloatField', 'DecimalField',
-                   'PositiveIntegerField', 'PositiveSmallIntegerField'
-               ] and f.name != 'id'
+            if (
+                    hasattr(f, 'get_internal_type') and
+                    f.get_internal_type() in [
+                        'IntegerField', 'FloatField', 'DecimalField',
+                        'PositiveIntegerField', 'PositiveSmallIntegerField'
+                    ] and
+                    f.name != 'id'
+            )
         ]
         avg = model()
         for field in numeric_fields:
