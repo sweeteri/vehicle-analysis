@@ -1,0 +1,188 @@
+Model,Battery-only range (miles),MPG (if operating on gas only),Car price (US $),kWh / 100 miles (if operating on battery only)
+BMW X5 xDrive45e,54,50,65000,44
+Mercedes-Benz GLE 350de,66,60,75000,38
+Toyota Prius Plug-In Hybrid,44,52,35000,26
+Volvo S60 Recharge,41,31,51250,44
+Volvo V60 Recharge,41,31,70550,44
+Toyota RAV4 Prime,42,38,45040,36
+Mitsubishi Outlander PHEV,38,26,41840,52
+Hyundai Tucson Plug-In Hybrid,33,35,40100,32
+Kia Niro Plug-In Hybrid,33,48,34390,31
+Dodge Hornet PHEV,33,29,42995,35
+Mazda CX-70 PHEV,26,56,57450,31
+BMW X5 xDrive50e,39,22,75000,44
+Jeep Wrangler 4xe,22,20,55000,49
+Jeep Grand Cherokee 4xe,25,23,60000,45
+Ford Escape PHEV,37,40,38000,32
+Kia Sportage PHEV,34,35,39000,33
+Alfa Romeo Tonale PHEV,33,29,44000,35
+Lexus NX 450h+ PHEV,37,36,58000,34
+Lincoln Corsair PHEV,27,33,53000,36
+Volvo XC60 Recharge,35,30,55000,43
+Bentley Bentayga Hybrid,25,19,160000,73
+BMW XM,31,23,160000,50
+Land Rover Range Rover P550,21,19,120000,65
+Land Rover Range Rover Sport P460,21,19,100000,65
+Lexus RX450h+ PHEV,37,36,65000,34
+Lexus TX 550h+ PHEV,33,35,70000,36
+Volvo XC90 Recharge,32,27,69000,44
+Toyota C-HR PHEV,41,53.8,35000,37
+Peugeot 408 PHEV,37,40.3,37000,35
+Ferrari SF90 Stradale,8,18,625000,66
+Ferrari 296 GTB,8,18,320000,65
+Ferrari 296 GTS,7,18,340000,65
+BMW 750e xDrive,34,27,95000,50
+Mercedes E 300 e,35,40.2,60000,38
+BMW 530e,21,41.1,55000,32
+Ford Kuga PHEV,37,50.1,36000,32
+Toyota Prius Prime SE,44,52,32350,26
+Toyota Prius Prime XSE,39,52,36170,29
+Toyota Prius Prime XSE Premium,39,52,39170,29
+Hyundai Ioniq Plug-in Hybrid,29,52,27850,28
+Audi Q5 TFSIe,23,61,54600,35
+Mercedes-Benz GLC 350e,54,25,59900,46
+Chrysler Pacifica Hybrid,32,30,54825,41
+Volvo S90 Recharge,38,30,60000,48
+Volvo V60 Recharge,41,31,70550,44
+BMW i3 REx,126,31,48000,32
+Porsche Cayenne S E-Hybrid,14,22,78000,71
+Porsche Panamera S E-Hybrid,16,25,93000,52
+Porsche 918 Spyder,12,22,845000,50
+Range Rover Evoque P300e,39,30,55000,38
+Mazda CX-90 PHEV,25,56,57000,31
+BMW X5 xDrive45e,54,50,65000,44
+Mercedes-Benz GLE 350de,66,60,75000,38
+Toyota Prius Plug-In Hybrid,44,52,35000,26
+Volvo S60 Recharge,41,31,51250,44
+Volvo V60 Recharge,41,31,70550,44
+Toyota RAV4 Prime,42,38,45040,36
+Mitsubishi Outlander PHEV,38,26,41840,52
+Hyundai Tucson Plug-In Hybrid,33,35,40100,32
+Kia Niro Plug-In Hybrid,33,48,34390,31
+Dodge Hornet PHEV,33,29,42995,35
+Mazda CX-70 PHEV,26,56,57450,31
+BMW X5 xDrive50e,39,22,75000,44
+Jeep Wrangler 4xe,22,20,55000,49
+Jeep Grand Cherokee 4xe,25,23,60000,45
+Ford Escape PHEV,37,40,38000,32
+Kia Sportage PHEV,34,35,39000,33
+Alfa Romeo Tonale PHEV,33,29,44000,35
+Lexus NX 450h+ PHEV,37,36,58000,34
+Lincoln Corsair PHEV,27,33,53000,36
+Volvo XC60 Recharge,35,30,55000,43
+Bentley Bentayga Hybrid,25,19,160000,73
+BMW XM,31,23,160000,50
+Land Rover Range Rover P550,21,19,120000,65
+Land Rover Range Rover Sport P460,21,19,100000,65
+Lexus RX450h+ PHEV,37,36,65000,34
+Lexus TX 550h+ PHEV,33,35,70000,36
+Volvo XC90 Recharge,32,27,69000,44
+Toyota C-HR PHEV,41,53.8,35000,37
+Peugeot 408 PHEV,37,40.3,37000,35
+Ferrari SF90 Stradale,8,18,625000,66
+Audi A3 e-tron,16,34,38900,41
+BMW 330e,22,31,43700,47
+BMW 740e,14,27,89100,52
+BMW i8,15,28,137000,43
+BMW X5 xDrive40e,13,24,64000,59
+Chevrolet Volt,53,37,34000,31
+Chrysler Pacifica Plug-in Hybrid,30,32,43100,40
+Ford C-Max Energi,19,38,32600,35
+Ford Fusion Energi,21,38,33900,35
+Hyundai Sonata Plug-in Hybrid,27,40,35400,34
+Kia Optima PHEV,29,40,35210,33
+Mercedes C350e,20,30,46400,56
+Mercedes S550e,20,26,95650,59
+Mercedes-Benz GLE550e,19,21,67000,69
+Mitsubishi Outlander PHEV,38,26,41600,52
+Porsche Cayenne S E-Hybrid,14,22,78000,71
+Porsche Panamera S E-Hybrid,16,25,93000,52
+Porsche 918 Spyder,12,22,845000,50
+Toyota Prius Prime,25,54,27100,25
+Volvo XC90 T8,17,22.5,69000,60
+Toyota RAV4 Prime,42,38,44790,36
+Chrysler Pacifica Hybrid,32,30,54825,41
+Volvo S60 Recharge,41,31,51250,44
+Hyundai Ioniq Plug-in Hybrid,29,52,27850,28
+Mercedes-Benz GLC 350e,54,25,59900,46
+BMW X5 xDrive45e,54,50,65000,44
+Mercedes-Benz GLE 350de,66,60,75000,38
+Toyota Prius Plug-In Hybrid,44,52,35000,26
+Volvo S60 Recharge,41,31,51250,44
+Volvo V60 Recharge,41,31,70550,44
+Toyota RAV4 Prime,42,38,45040,36
+Mitsubishi Outlander PHEV,38,26,41840,52
+Hyundai Tucson Plug-In Hybrid,33,35,40100,32
+Kia Niro Plug-In Hybrid,33,48,34390,31
+Dodge Hornet PHEV,33,29,42995,35
+Mazda CX-70 PHEV,26,56,57450,31
+BMW X5 xDrive50e,39,22,75000,44
+Jeep Wrangler 4xe,22,20,55000,49
+Jeep Grand Cherokee 4xe,25,23,60000,45
+Ford Escape PHEV,37,40,38000,32
+Kia Sportage PHEV,34,35,39000,33
+Alfa Romeo Tonale PHEV,33,29,44000,35
+Lexus NX 450h+ PHEV,37,36,58000,34
+Lincoln Corsair PHEV,27,33,53000,36
+Volvo XC60 Recharge,35,30,55000,43
+Bentley Bentayga Hybrid,25,19,160000,73
+BMW XM,31,23,160000,50
+Land Rover Range Rover P550,21,19,120000,65
+Land Rover Range Rover Sport P460,21,19,100000,65
+Lexus RX450h+ PHEV,37,36,65000,34
+Lexus TX 550h+ PHEV,33,35,70000,36
+Volvo XC90 Recharge,32,27,69000,44
+Toyota C-HR PHEV,41,53.8,35000,37
+Peugeot 408 PHEV,37,40.3,37000,35
+Ferrari SF90 Stradale,8,18,625000,66
+Ferrari 296 GTB,8,18,320000,65
+Ferrari 296 GTS,7,18,340000,65
+BMW 750e xDrive,34,27,95000,50
+Mercedes E 300 e,35,40.2,60000,38
+BMW 530e,21,41.1,55000,32
+Ford Kuga PHEV,37,50.1,36000,32
+Toyota Prius Prime SE,44,52,32350,26
+Toyota Prius Prime XSE,39,52,36170,29
+Toyota Prius Prime XSE Premium,39,52,39170,29
+Hyundai Ioniq Plug-in Hybrid,29,52,27850,28
+Audi Q5 TFSIe,23,61,54600,35
+Mercedes-Benz GLC 350e,54,25,59900,46
+Chrysler Pacifica Hybrid,32,30,54825,41
+Volvo S90 Recharge,38,30,60000,48
+Volvo V60 Recharge,41,31,70550,44
+BMW i3 REx,126,31,48000,32
+Porsche Cayenne S E-Hybrid,14,22,78000,71
+Porsche Panamera S E-Hybrid,16,25,93000,52
+Porsche 918 Spyder,12,22,845000,50
+Range Rover Evoque P300e,39,30,55000,38
+Mazda CX-90 PHEV,25,56,57000,31
+BMW X5 xDrive45e,54,50,65000,44
+Mercedes-Benz GLE 350de,66,60,75000,38
+Toyota Prius Plug-In Hybrid,44,52,35000,26
+Volvo S60 Recharge,41,31,51250,44
+Volvo V60 Recharge,41,31,70550,44
+Toyota RAV4 Prime,42,38,45040,36
+Mitsubishi Outlander PHEV,38,26,41840,52
+Hyundai Tucson Plug-In Hybrid,33,35,40100,32
+Kia Niro Plug-In Hybrid,33,48,34390,31
+Dodge Hornet PHEV,33,29,42995,35
+Mazda CX-70 PHEV,26,56,57450,31
+BMW X5 xDrive50e,39,22,75000,44
+Jeep Wrangler 4xe,22,20,55000,49
+Jeep Grand Cherokee 4xe,25,23,60000,45
+Ford Escape PHEV,37,40,38000,32
+Kia Sportage PHEV,34,35,39000,33
+Alfa Romeo Tonale PHEV,33,29,44000,35
+Lexus NX 450h+ PHEV,37,36,58000,34
+Lincoln Corsair PHEV,27,33,53000,36
+Volvo XC60 Recharge,35,30,55000,43
+Bentley Bentayga Hybrid,25,19,160000,73
+BMW XM,31,23,160000,50
+Land Rover Range Rover P550,21,19,120000,65
+Land Rover Range Rover Sport P460,21,19,100000,65
+Lexus RX450h+ PHEV,37,36,65000,34
+Lexus TX 550h+ PHEV,33,35,70000,36
+Volvo XC90 Recharge,32,27,69000,44
+Toyota C-HR PHEV,41,53.8,35000,37
+Peugeot 408 PHEV,37,40.3,37000,35
+Ferrari SF90 Stradale,8,18,625000,66
