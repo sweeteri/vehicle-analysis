@@ -32,7 +32,7 @@ class VehicleSelectForm(forms.Form):
     phevv_vehicle = forms.ModelChoiceField(
         queryset=PHEVVehicle.objects.all(),
         required=False,
-        label='Подключаемый гибрид (PHEV)',
+        label='Заражаемый гибрид (PHEV)',
         widget=forms.Select(attrs={'class': 'form-select'})
     )
     ev_vehicle = forms.ModelChoiceField(
@@ -102,8 +102,8 @@ class VehicleSelectForm(forms.Form):
     compare_types = forms.MultipleChoiceField(
         choices=[
             ('ICE', 'ДВС'),
-            ('HEV', 'Гибрид'),
-            ('PHEV', 'PHEV'),
+            ('HEV', 'Гибриды'),
+            ('PHEV', 'Заряжаемые гибриды'),
             ('EV', 'Электро')
         ],
         widget=forms.CheckboxSelectMultiple,

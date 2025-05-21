@@ -41,7 +41,8 @@
         <thead class="table-light">
           <tr>
             <th>Транспортное средство</th>
-            <th>Энергия (МДж)</th>
+            <th>Топливо (л)</th>
+            <th>Электроэнергия (кВт·ч)</th>
             <th>Выбросы CO₂ (г)</th>
             <th>Стоимость (руб)</th>
           </tr>
@@ -50,7 +51,8 @@
           {% for item in results %}
           <tr>
             <td><strong>{{ item.vehicle.mark_name }} {{ item.vehicle.model_name }}</strong></td>
-            <td>{{ item.summary.energy_mj|floatformat:1 }}</td>
+            <td>{{ item.summary.fuel_liters|floatformat:2 }}</td>
+            <td>{{ item.summary.energy_kwh|floatformat:2 }}</td>
             <td>{{ item.summary.co2_g|floatformat:1 }}</td>
             <td>{{ item.summary.cost_rub|floatformat:1 }}</td>
           </tr>

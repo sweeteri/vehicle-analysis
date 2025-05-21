@@ -68,13 +68,20 @@ class SimulationView(FormView):
             total_co2 = sum(day['co2_g'] for day in sim)
             total_cost = sum(day['cost_rub'] for day in sim)
 
+            # ДОБАВЛЯЕМ НОВЫЕ РАСЧЕТЫ:
+            total_fuel = sum(day['energy'].get('fuel_liters', 0) for day in sim)
+            total_electric = sum(day['energy'].get('energy_kwh', 0) for day in sim)
+
             results.append({
                 'vehicle': v,
                 'daily': sim,
                 'summary': {
                     'energy_mj': total_energy,
                     'co2_g': total_co2,
-                    'cost_rub': total_cost
+                    'cost_rub': total_cost,
+                    # ДОБАВЛЯЕМ НОВЫЕ ПОЛЯ:
+                    'fuel_liters': total_fuel,
+                    'energy_kwh': total_electric
                 }
             })
 
@@ -127,8 +134,8 @@ class SimulationView(FormView):
                 setattr(avg, field, sum(vals) / len(vals))
         avg.mark_name = "Средний"
         avg.model_name = {
-            'ICE': 'ДВС', 'HEV': 'Гибрид',
-            'PHEV': 'PHEV', 'EV': 'Электро'
+            'ICE': 'ДВС', 'HEV': 'Гибриды',
+            'PHEV': 'Заряжаемые гибриды', 'EV': 'Электро'
         }[vehicle_type]
         avg.id = -1
         return avg
@@ -214,6 +221,8 @@ class SimulationView(FormView):
         )
 
         return {
-            key: plot(fig, output_type='div', config={'displayModeBar': False})
-            for key, fig in figs.items()
+            'fuel': plot(figs['fuel'], output_type='div', config={'displayModeBar': False}),
+            'electric': plot(figs['electric'], output_type='div', config={'displayModeBar': False}),
+            'emissions': plot(figs['emissions'], output_type='div', config={'displayModeBar': False}),
+            'cost': plot(figs['cost'], output_type='div', config={'displayModeBar': False}),
         }
