@@ -4,7 +4,7 @@ import random
 from calculator.engines.energy import EnergyCalculator
 
 
-def simulate_daily_energy(vehicle, start_date, end_date, daily_km, driving_conditions='mixed'):
+def simulate_daily_energy(vehicle, start_date, end_date, daily_km, driving_conditions):
     results = []
     current = start_date
     alpha = 0.1  # амплитуда сезонного колебания ±10%
@@ -25,10 +25,18 @@ def simulate_daily_energy(vehicle, start_date, end_date, daily_km, driving_condi
         # шумовой множитель
         noise = random.gauss(1, sigma)
 
+        # Список всех числовых полей, которые нужно скорректировать
+        numeric_fields = [
+            'fuel_liters', 'energy_mj', 'useful_energy_mj', 'energy_kwh',
+            'total_energy_mj', 'battery_depletion', 'MPGe',
+            'fuel_consumption_l_100km', 'efficiency', 'ice_share',
+            'electric_share'
+        ]
+
         # корректируем все численные поля в res
-        for key in list(res.keys()):
-            if isinstance(res[key], (int, float)):
-                res[key] = res[key] * season * noise
+        for field in numeric_fields:
+            if field in res and isinstance(res[field], (int, float)):
+                res[field] = res[field] * season * noise
 
         res['date'] = current
         results.append(res)

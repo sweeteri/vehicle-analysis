@@ -5,7 +5,7 @@ from calculator.engines.emissions import EmissionsCalculator
 
 
 def simulate_daily_emissions(vehicle, start_date, end_date, daily_km,
-                             energy_source='eu_avg', driving_conditions='mixed',
+                             energy_source, driving_conditions,
                              use_recuperation=True, urban_share=0.5):
     results = []
     current = start_date

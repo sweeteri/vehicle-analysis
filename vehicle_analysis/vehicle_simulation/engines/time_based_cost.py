@@ -4,7 +4,7 @@ import random
 from calculator.engines.cost import TCOService
 
 
-def simulate_daily_cost(vehicle, start_date, end_date, daily_km, driving_conditions='mixed'):
+def simulate_daily_cost(vehicle, start_date, end_date, daily_km, driving_conditions):
     results = []
     current = start_date
     alpha = 0.1
